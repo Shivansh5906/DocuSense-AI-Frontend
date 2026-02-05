@@ -1,16 +1,82 @@
-# React + Vite
+# 📄 DocuSense AI – Frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+DocuSense AI is an intelligent document analysis platform that enables users to upload documents, generate AI-powered summaries, and interact with documents using a chat-based interface.
 
-Currently, two official plugins are available:
+This repository contains the **frontend implementation** of DocuSense AI, focused on usability, performance, and a clean modern UI.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+---
 
-## React Compiler
+## 🚀 Features
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- 📤 Upload documents from the system
+- 📊 Upload progress indicator
+- 🧠 AI-generated document summaries
+- 💬 Chatbot-style Q&A interface for documents
+- 🎨 Clean and responsive user interface
+- ⚡ Fast development using Vite
 
-## Expanding the ESLint configuration
+---
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+## 🛠 Tech Stack
+
+### Frontend
+- React (JSX)
+- Vite
+- HTML5
+- CSS3
+- JavaScript (ES6+)
+
+### API Communication
+- Axios (REST API)
+
+
+
+
+
+---
+
+## ⚙️ How to Run Locally
+
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/Shivansh5906/DocuSense-AI-Frontend.git
+
+2. cd DocuSense-AI-Frontend/docusense-ui
+
+3. npm install
+
+4. npm run dev
+
+5. http://localhost:5173
+
+
+🔗 Backend Integration
+
+The frontend communicates with a backend service responsible for:
+
+Document processing
+
+Text embeddings
+
+AI-based summarization
+
+Question answering using RAG (Retrieval Augmented Generation)
+
+
+🎯 Use Cases
+
+Students summarizing notes and PDFs
+
+Professionals analyzing reports
+
+Researchers extracting insights from documents
+
+Anyone needing quick understanding of large files
+
+
+👨‍💻 Author
+
+Shivansh Chitranshi
+B.Tech CSE | Java Full Stack & AI Enthusiast
+
+GitHub: https://github.com/Shivansh5906
