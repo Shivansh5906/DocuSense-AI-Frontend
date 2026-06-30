@@ -1,7 +1,16 @@
 import axios from "axios";
 
+// Automatically detect if the app is running locally or deployed
+const isLocalhost =
+  typeof window !== "undefined" &&
+  (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1");
+
+const defaultBaseURL = isLocalhost
+  ? "http://127.0.0.1:8000/api/v1"
+  : "https://docusense-ai-backend.onrender.com/api/v1";
+
 const api = axios.create({
-  baseURL: "https://docusense-ai-backend.onrender.com/api/v1",
+  baseURL: import.meta.env.VITE_API_BASE_URL || defaultBaseURL,
 });
 
 // Automatically inject JWT token into all outbound request headers
