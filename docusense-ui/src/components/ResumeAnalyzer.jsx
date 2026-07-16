@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import api from "../api/client";
 import "./ResumeAnalyzer.css";
 
-export default function ResumeAnalyzer({ documents: allDocs = [], selectedFilename, setSelectedFilename }) {
+export default function ResumeAnalyzer({ documents: allDocs = [], selectedFilename, setSelectedFilename, forceTab, onUploadDone }) {
   const [jdText, setJdText] = useState("");
   const [jdTitle, setJdTitle] = useState("");
   const [jdCompany, setJdCompany] = useState("");
@@ -15,10 +15,97 @@ export default function ResumeAnalyzer({ documents: allDocs = [], selectedFilena
   const [activeReportTab, setActiveReportTab] = useState("jd_match"); // "jd_match", "gaps", "ats", "interview", "rewriter", "cover_letter"
   const [viewMode, setViewMode] = useState("create"); // "create" or "history"
 
+  const [uploadLoading, setUploadLoading] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
+
+  const handleInlineUpload = async (file) => {
+    if (!file) return;
+
+    const formData = new FormData();
+    formData.append("file", file);
+
+    try {
+      setUploadLoading(true);
+      setUploadProgress(10);
+
+      await api.post("/documents/upload", formData, {
+        onUploadProgress: (e) => {
+          if (e.total) {
+            const percent = Math.round((e.loaded * 100) / e.total);
+            setUploadProgress(Math.min(percent, 95));
+          }
+        },
+      });
+
+      setUploadProgress(100);
+      
+      if (onUploadDone) {
+        onUploadDone(file.name);
+      }
+      
+      setTimeout(async () => {
+        setUploadProgress(0);
+        setUploadLoading(false);
+        
+        setLoading(true);
+        setError("");
+        setReport(null);
+
+        try {
+          const res = await api.post("/resume/analyze", {
+            filename: file.name,
+            jd_text: jdText,
+            jd_title: jdTitle,
+            jd_company: jdCompany,
+            resume_version_id: null
+          });
+          
+          setReport(res.data);
+          if (res.data.roadmap) {
+            setRoadmapItems(res.data.roadmap);
+          } else {
+            setRoadmapItems([]);
+          }
+          fetchHistory();
+          setActiveReportTab("ats");
+        } catch (err) {
+          console.error("Auto analysis failed", err);
+          setError(
+            err.response?.data?.detail || 
+            "Failed to complete resume analysis. Please verify your Gemini API key and try again."
+          );
+        } finally {
+          setLoading(false);
+        }
+      }, 1000);
+
+    } catch (err) {
+      console.error("Inline upload failed", err);
+      alert("Resume upload failed. Please make sure the file is a valid PDF or DOCX.");
+      setUploadProgress(0);
+      setUploadLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (forceTab) {
+      setActiveReportTab(forceTab);
+    }
+  }, [forceTab]);
+
   const [coverLetterReport, setCoverLetterReport] = useState(null);
   const [generatingCoverLetter, setGeneratingCoverLetter] = useState(false);
   const [coverLetterTone, setCoverLetterTone] = useState("professional");
   const [coverLetterError, setCoverLetterError] = useState("");
+  const [versions, setVersions] = useState([]);
+  const [selectedVersionId, setSelectedVersionId] = useState("");
+  const [showVersionModal, setShowVersionModal] = useState(false);
+  const [newVersionName, setNewVersionName] = useState("");
+  const [newVersionText, setNewVersionText] = useState("");
+  const [editingVersionId, setEditingVersionId] = useState(null);
+  const [editingVersionText, setEditingVersionText] = useState("");
+  const [showEditorPanel, setShowEditorPanel] = useState(false);
+  const [roadmapItems, setRoadmapItems] = useState([]);
 
   // Filter PDF and DOCX files for resume selection, ensuring they are valid and fully completed
   const documents = allDocs.filter(doc => {
@@ -40,7 +127,28 @@ export default function ResumeAnalyzer({ documents: allDocs = [], selectedFilena
     setViewMode("create");
     setCoverLetterReport(null);
     setCoverLetterError("");
+    setEditingVersionId(null);
+    setEditingVersionText("");
+    setShowEditorPanel(false);
+    
+    if (selectedFilename) {
+      fetchVersions(selectedFilename);
+    } else {
+      setVersions([]);
+      setSelectedVersionId("");
+    }
   }, [selectedFilename]);
+
+  const fetchVersions = async (filename) => {
+    try {
+      const res = await api.get("/resume/versions", { params: { filename } });
+      if (res.data && res.data.versions) {
+        setVersions(res.data.versions);
+      }
+    } catch (err) {
+      console.error("Failed to fetch versions", err);
+    }
+  };
 
   // Fetch history on mount
   useEffect(() => {
@@ -74,10 +182,16 @@ export default function ResumeAnalyzer({ documents: allDocs = [], selectedFilena
         filename: selectedFilename,
         jd_text: jdText,
         jd_title: jdTitle,
-        jd_company: jdCompany
+        jd_company: jdCompany,
+        resume_version_id: selectedVersionId ? parseInt(selectedVersionId, 10) : null
       });
       
       setReport(res.data);
+      if (res.data.roadmap) {
+        setRoadmapItems(res.data.roadmap);
+      } else {
+        setRoadmapItems([]);
+      }
       // Refresh history list
       fetchHistory();
       // Auto-set report tab
@@ -106,6 +220,11 @@ export default function ResumeAnalyzer({ documents: allDocs = [], selectedFilena
     try {
       const res = await api.get(`/resume/analysis/${analysisId}`);
       setReport(res.data);
+      if (res.data.roadmap) {
+        setRoadmapItems(res.data.roadmap);
+      } else {
+        setRoadmapItems([]);
+      }
       setViewMode("create"); // Return to report view
       if (res.data.jd_text) {
         setActiveReportTab("jd_match");
@@ -118,6 +237,90 @@ export default function ResumeAnalyzer({ documents: allDocs = [], selectedFilena
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleCreateVersion = async () => {
+    if (!newVersionName.trim()) {
+      alert("Please enter a version name.");
+      return;
+    }
+    try {
+      const res = await api.post("/resume/versions", {
+        filename: selectedFilename,
+        version_name: newVersionName,
+        tailored_text: newVersionText
+      });
+      alert(res.data.message);
+      setShowVersionModal(false);
+      setNewVersionName("");
+      setNewVersionText("");
+      await fetchVersions(selectedFilename);
+      setSelectedVersionId(res.data.version_id.toString());
+    } catch (err) {
+      console.error("Failed to create version", err);
+      alert("Failed to create tailored version.");
+    }
+  };
+
+  const handleUpdateVersion = async () => {
+    if (!editingVersionId) return;
+    try {
+      await api.put(`/resume/versions/${editingVersionId}`, {
+        tailored_text: editingVersionText
+      });
+      alert("Tailored resume text saved successfully!");
+      setVersions(prev => 
+        prev.map(v => v.id === editingVersionId ? { ...v, tailored_text: editingVersionText } : v)
+      );
+      setShowEditorPanel(false);
+      setEditingVersionId(null);
+    } catch (err) {
+      console.error("Failed to update version", err);
+      alert("Failed to save changes.");
+    }
+  };
+
+  const handleDeleteVersion = async (versionId, e) => {
+    e.stopPropagation();
+    if (!window.confirm("Are you sure you want to delete this version?")) return;
+    try {
+      await api.delete(`/resume/versions/${versionId}`);
+      if (selectedVersionId === versionId.toString()) {
+        setSelectedVersionId("");
+      }
+      await fetchVersions(selectedFilename);
+    } catch (err) {
+      console.error("Failed to delete version", err);
+      alert("Failed to delete version.");
+    }
+  };
+
+  const handleToggleRoadmapItem = async (itemId, currentStatus) => {
+    const nextStatus = currentStatus === "completed" ? "missing" : "completed";
+    setRoadmapItems(prev =>
+      prev.map(item => item.id === itemId ? { ...item, status: nextStatus } : item)
+    );
+    try {
+      await api.put(`/resume/roadmap/${itemId}`, { status: nextStatus });
+    } catch (err) {
+      console.error("Failed to toggle roadmap status", err);
+      setRoadmapItems(prev =>
+        prev.map(item => item.id === itemId ? { ...item, status: currentStatus } : item)
+      );
+    }
+  };
+
+  const calculateProjectedScore = () => {
+    if (!report || report.match_score === null || report.match_score === undefined) return 0;
+    const baseScore = report.match_score;
+    if (!roadmapItems || roadmapItems.length === 0) return baseScore;
+    
+    const completedCount = roadmapItems.filter(item => item.status === "completed").length;
+    const totalCount = roadmapItems.length;
+    
+    const potentialGain = 100 - baseScore;
+    const projected = baseScore + (completedCount / totalCount) * potentialGain;
+    return Math.round(projected);
   };
 
   const handleGenerateCoverLetter = async () => {
@@ -246,23 +449,122 @@ export default function ResumeAnalyzer({ documents: allDocs = [], selectedFilena
               <form onSubmit={handleAnalyze} className="analyzer-setup-card">
                 <h3>Configure Analysis</h3>
                 
-                <div className="input-group">
-                  <label htmlFor="resume-select">Select Uploaded Resume</label>
+                {/* Inline Upload Zone */}
+                <div className="inline-upload-box">
+                  <label className="inline-upload-dropzone">
+                    <input 
+                      type="file" 
+                      accept=".pdf,.docx" 
+                      onChange={(e) => {
+                        if (e.target.files && e.target.files[0]) {
+                          handleInlineUpload(e.target.files[0]);
+                        }
+                      }}
+                      hidden
+                      disabled={uploadLoading}
+                    />
+                    <div className="dropzone-content">
+                      <span className="dropzone-icon">📤</span>
+                      <strong>Upload Resume to Check Score</strong>
+                      <p>Drag and drop or click to choose a PDF or DOCX file</p>
+                    </div>
+                  </label>
+                  {uploadLoading && (
+                    <div className="inline-progress-wrapper" style={{ marginTop: "12px" }}>
+                      <div className="progress-text-label" style={{ fontSize: "0.8rem", color: "var(--text-secondary)", marginBottom: "4px", textAlign: "left" }}>
+                        Uploading: {uploadProgress}%
+                      </div>
+                      <div className="progress-bar-track" style={{ height: "6px", background: "rgba(15, 23, 42, 0.08)", borderRadius: "3px", overflow: "hidden" }}>
+                        <div className="progress-bar-fill" style={{ width: `${uploadProgress}%`, height: "100%", background: "var(--success)", transition: "width 0.2s ease" }}></div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                <div className="input-group" style={{ marginTop: "20px" }}>
+                  <label htmlFor="resume-select">Or Select Already Uploaded Resume</label>
                   {documents.length === 0 ? (
                     <div className="no-resumes-warning">
-                      ⚠️ No PDF or Word document uploaded. Please upload a resume using the sidebar upload tool first.
+                      ⚠️ No resumes found in workspace. Upload a file above to begin.
                     </div>
                   ) : (
-                    <select 
-                      id="resume-select"
-                      value={selectedFilename} 
-                      onChange={(e) => setSelectedFilename(e.target.value)}
-                      className="form-select"
-                    >
-                      {documents.map((doc, idx) => (
-                        <option key={idx} value={doc.filename}>{doc.filename}</option>
-                      ))}
-                    </select>
+                    <>
+                      <select 
+                        id="resume-select"
+                        value={selectedFilename || ""} 
+                        onChange={(e) => setSelectedFilename(e.target.value)}
+                        className="form-select"
+                      >
+                        <option value="" disabled>-- Select a resume --</option>
+                        {documents.map((doc, idx) => (
+                          <option key={idx} value={doc.filename}>{doc.filename}</option>
+                        ))}
+                      </select>
+                      
+                      {/* Version Controls */}
+                      <div className="version-selector-container" style={{ marginTop: "12px" }}>
+                        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "6px" }}>
+                          <label style={{ fontSize: "0.85rem", color: "var(--text-secondary)", fontWeight: "500" }}>Resume Target Version</label>
+                          <button 
+                            type="button" 
+                            className="create-ver-btn"
+                            style={{ background: "transparent", border: "none", color: "var(--primary-light)", fontSize: "0.8rem", fontWeight: "600", cursor: "pointer" }}
+                            onClick={() => {
+                              setNewVersionName("");
+                              setNewVersionText("");
+                              setShowVersionModal(true);
+                            }}
+                          >
+                            ➕ Clone to Tailor
+                          </button>
+                        </div>
+                        <div style={{ display: "flex", gap: "8px" }}>
+                          <select
+                            value={selectedVersionId}
+                            onChange={(e) => setSelectedVersionId(e.target.value)}
+                            className="form-select"
+                            style={{ flex: 1 }}
+                          >
+                            <option value="">Original Base Text</option>
+                            {versions.map((ver) => (
+                              <option key={ver.id} value={ver.id.toString()}>
+                                📄 {ver.version_name}
+                              </option>
+                            ))}
+                          </select>
+                          
+                          {selectedVersionId && (
+                            <>
+                              <button
+                                type="button"
+                                className="action-ver-btn edit"
+                                style={{ padding: "0 10px", background: "#374151", border: "1px solid var(--border-glass)", borderRadius: "6px", cursor: "pointer" }}
+                                onClick={() => {
+                                  const ver = versions.find(v => v.id.toString() === selectedVersionId);
+                                  if (ver) {
+                                    setEditingVersionId(ver.id);
+                                    setEditingVersionText(ver.tailored_text);
+                                    setShowEditorPanel(true);
+                                  }
+                                }}
+                                title="Edit Tailored Text"
+                              >
+                                ✏️
+                              </button>
+                              <button
+                                type="button"
+                                className="action-ver-btn delete"
+                                style={{ padding: "0 10px", background: "#991b1b", border: "1px solid var(--border-glass)", borderRadius: "6px", cursor: "pointer" }}
+                                onClick={(e) => handleDeleteVersion(parseInt(selectedVersionId, 10), e)}
+                                title="Delete Version"
+                              >
+                                🗑️
+                              </button>
+                            </>
+                          )}
+                        </div>
+                      </div>
+                    </>
                   )}
                 </div>
 
@@ -411,6 +713,14 @@ export default function ResumeAnalyzer({ documents: allDocs = [], selectedFilena
                 >
                   ✉️ Cover Letter & Outreach
                 </button>
+                {roadmapItems && roadmapItems.length > 0 && (
+                  <button 
+                    className={`report-tab-btn ${activeReportTab === "roadmap" ? "active" : ""}`}
+                    onClick={() => setActiveReportTab("roadmap")}
+                  >
+                    🛣️ Skills Roadmap
+                  </button>
+                )}
               </div>
 
               {/* Report Content Panels */}
@@ -712,7 +1022,7 @@ export default function ResumeAnalyzer({ documents: allDocs = [], selectedFilena
                               value={jdTitle}
                               onChange={(e) => setJdTitle(e.target.value)}
                               className="form-input"
-                              style={{ padding: "8px", fontSize: "0.85rem", background: "#111827", border: "1px solid var(--border-glass)", color: "#fff", borderRadius: "6px" }}
+                              style={{ padding: "8px", fontSize: "0.85rem", background: "#ffffff", border: "1px solid var(--border-glass)", color: "var(--text-main)", borderRadius: "6px" }}
                             />
                           </div>
                           <div className="input-group" style={{ display: "flex", flexDirection: "column", gap: "6px", textAlign: "left" }}>
@@ -723,7 +1033,7 @@ export default function ResumeAnalyzer({ documents: allDocs = [], selectedFilena
                               value={jdCompany}
                               onChange={(e) => setJdCompany(e.target.value)}
                               className="form-input"
-                              style={{ padding: "8px", fontSize: "0.85rem", background: "#111827", border: "1px solid var(--border-glass)", color: "#fff", borderRadius: "6px" }}
+                              style={{ padding: "8px", fontSize: "0.85rem", background: "#ffffff", border: "1px solid var(--border-glass)", color: "var(--text-main)", borderRadius: "6px" }}
                             />
                           </div>
                         </div>
@@ -738,7 +1048,7 @@ export default function ResumeAnalyzer({ documents: allDocs = [], selectedFilena
                               onChange={(e) => setJdText(e.target.value)}
                               rows={6}
                               className="form-textarea"
-                              style={{ padding: "8px", fontSize: "0.85rem", background: "#111827", border: "1px solid var(--border-glass)", color: "#fff", borderRadius: "6px", width: "100%", boxSizing: "border-box" }}
+                              style={{ padding: "8px", fontSize: "0.85rem", background: "#ffffff", border: "1px solid var(--border-glass)", color: "var(--text-main)", borderRadius: "6px", width: "100%", boxSizing: "border-box" }}
                             ></textarea>
                           </div>
                         )}
@@ -801,7 +1111,7 @@ export default function ResumeAnalyzer({ documents: allDocs = [], selectedFilena
                                 value={jdTitle}
                                 onChange={(e) => setJdTitle(e.target.value)}
                                 className="form-input"
-                                style={{ padding: "6px 10px", fontSize: "0.8rem", background: "#111827", border: "1px solid var(--border-glass)", color: "#fff", borderRadius: "6px" }}
+                                style={{ padding: "6px 10px", fontSize: "0.8rem", background: "#ffffff", border: "1px solid var(--border-glass)", color: "var(--text-main)", borderRadius: "6px" }}
                               />
                             </div>
                             <div className="input-group" style={{ display: "flex", flexDirection: "column", gap: "6px", textAlign: "left" }}>
@@ -811,7 +1121,7 @@ export default function ResumeAnalyzer({ documents: allDocs = [], selectedFilena
                                 value={jdCompany}
                                 onChange={(e) => setJdCompany(e.target.value)}
                                 className="form-input"
-                                style={{ padding: "6px 10px", fontSize: "0.8rem", background: "#111827", border: "1px solid var(--border-glass)", color: "#fff", borderRadius: "6px" }}
+                                style={{ padding: "6px 10px", fontSize: "0.8rem", background: "#ffffff", border: "1px solid var(--border-glass)", color: "var(--text-main)", borderRadius: "6px" }}
                               />
                             </div>
                             <div className="input-group" style={{ display: "flex", flexDirection: "column", gap: "6px", textAlign: "left" }}>
@@ -878,9 +1188,125 @@ export default function ResumeAnalyzer({ documents: allDocs = [], selectedFilena
                     )}
                   </div>
                 )}
+                
+                {/* 7. SKILLS ROADMAP TAB */}
+                {activeReportTab === "roadmap" && (
+                  <div className="tab-pane roadmap-pane">
+                    <h3>🛣️ Technology & Skills Development Roadmap</h3>
+                    <p className="pane-intro">Use this interactive checklist to target and check off missing skills. As you complete items, your projected match score will dynamically climb.</p>
+                    
+                    <div className="roadmap-score-progress-card" style={{ background: "rgba(0, 0, 0, 0.03)", padding: "20px", borderRadius: "10px", border: "1px solid var(--border-glass)", marginBottom: "20px" }}>
+                      <div className="roadmap-score-bar-wrapper">
+                        <div className="roadmap-score-label" style={{ display: "flex", justifyContent: "space-between", marginBottom: "10px", fontSize: "0.95rem" }}>
+                          <span>Base Match Score: <strong>{report.match_score.toFixed(0)}%</strong></span>
+                          <span>Projected Score: <strong style={{ color: "#10b981", padding: "2px 8px", background: "rgba(16, 185, 129, 0.15)", borderRadius: "4px" }}>{calculateProjectedScore()}%</strong></span>
+                        </div>
+                        <div className="roadmap-progress-track" style={{ height: "12px", background: "#cbd5e1", borderRadius: "6px", overflow: "hidden", position: "relative" }}>
+                          <div className="roadmap-progress-fill base-fill" style={{ position: "absolute", left: 0, top: 0, bottom: 0, width: `${report.match_score}%`, background: "#4f46e5", transition: "width 0.4s ease" }}></div>
+                          <div className="roadmap-progress-fill projected-fill" style={{ position: "absolute", left: 0, top: 0, bottom: 0, width: `${calculateProjectedScore()}%`, background: "#10b981", transition: "width 0.4s ease", opacity: 0.7 }}></div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="roadmap-items-list" style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
+                      {roadmapItems.map((item) => (
+                        <div key={item.id} className={`roadmap-item-card ${item.status}`} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "14px", background: "rgba(0, 0, 0, 0.02)", border: "1px solid var(--border-glass)", borderRadius: "8px", transition: "all 0.2s ease" }}>
+                          <div className="roadmap-item-checkbox-wrapper" style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+                            <input
+                              type="checkbox"
+                              id={`roadmap-chk-${item.id}`}
+                              checked={item.status === "completed"}
+                              onChange={() => handleToggleRoadmapItem(item.id, item.status)}
+                              style={{ width: "16px", height: "16px", cursor: "pointer" }}
+                            />
+                            <label htmlFor={`roadmap-chk-${item.id}`} style={{ fontSize: "0.95rem", cursor: "pointer", textDecoration: item.status === "completed" ? "line-through" : "none", color: item.status === "completed" ? "var(--text-secondary)" : "var(--text-main)" }}>
+                              {item.skill_name}
+                            </label>
+                          </div>
+                          <div className="roadmap-item-actions" style={{ display: "flex", alignItems: "center", gap: "15px" }}>
+                            <span className={`roadmap-status-badge badge-${item.status}`} style={{ fontSize: "0.75rem", padding: "4px 8px", borderRadius: "4px", background: item.status === "completed" ? "rgba(16, 185, 129, 0.15)" : item.status === "in_progress" ? "rgba(245, 158, 11, 0.15)" : "rgba(239, 68, 68, 0.15)", color: item.status === "completed" ? "#10b981" : item.status === "in_progress" ? "#f59e0b" : "#ef4444" }}>
+                              {item.status === "completed" ? "✅ Completed" : item.status === "in_progress" ? "⏳ In Progress" : "⚠️ Missing"}
+                            </span>
+                            <a
+                              href={item.learning_url}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              style={{ fontSize: "0.85rem", color: "var(--primary-light)", textDecoration: "none", fontWeight: "500" }}
+                              title="Search learning content"
+                            >
+                              📺 Learn on YouTube ➔
+                            </a>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
           )}
+        </div>
+      )}
+
+      {/* Version Clone/Tailoring Modal */}
+      {showVersionModal && (
+        <div className="modal-overlay">
+          <div className="modal-content" style={{ maxWidth: "600px", width: "90%", background: "#1f2937", border: "1px solid var(--border-glass)", borderRadius: "12px", padding: "24px" }}>
+            <h2 style={{ marginTop: 0, marginBottom: "8px" }}>➕ Clone & Tailor Resume Version</h2>
+            <p style={{ color: "var(--text-secondary)", fontSize: "0.85rem", marginBottom: "20px" }}>Create a dedicated text-based version of your CV. If you leave the tailored text blank, it will copy the original file's text for editing.</p>
+            <div className="input-group" style={{ marginBottom: "15px" }}>
+              <label style={{ fontSize: "0.85rem", fontWeight: "600", display: "block", marginBottom: "6px" }}>Version Name</label>
+              <input
+                type="text"
+                placeholder="e.g. Web Developer Specialization"
+                value={newVersionName}
+                onChange={(e) => setNewVersionName(e.target.value)}
+                className="form-input"
+                style={{ width: "100%" }}
+              />
+            </div>
+            <div className="input-group" style={{ marginBottom: "20px" }}>
+              <label style={{ fontSize: "0.85rem", fontWeight: "600", display: "block", marginBottom: "6px" }}>Initial Tailored Text (Optional)</label>
+              <textarea
+                placeholder="Paste tailored resume text here, or leave blank to start with original CV text..."
+                value={newVersionText}
+                onChange={(e) => setNewVersionText(e.target.value)}
+                rows={8}
+                className="form-textarea"
+                style={{ width: "100%" }}
+              ></textarea>
+            </div>
+            <div style={{ display: "flex", gap: "10px", justifyContent: "flex-end" }}>
+              <button className="secondary-btn" style={{ padding: "8px 16px", borderRadius: "6px", background: "transparent", border: "1px solid var(--border-glass)", color: "#fff", cursor: "pointer" }} onClick={() => setShowVersionModal(false)}>Cancel</button>
+              <button className="primary-btn" style={{ padding: "8px 16px", borderRadius: "6px", background: "var(--primary-gradient)", border: "none", color: "#fff", cursor: "pointer", fontWeight: "600" }} onClick={handleCreateVersion}>Create Version</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Editor Panel Overlay */}
+      {showEditorPanel && (
+        <div className="modal-overlay">
+          <div className="modal-content" style={{ maxWidth: "800px", width: "90%", background: "#ffffff", border: "1px solid var(--border-glass)", borderRadius: "12px", padding: "24px" }}>
+            <h2 style={{ marginTop: 0, marginBottom: "8px" }}>✏️ Edit Resume Version Text</h2>
+            <p style={{ color: "var(--text-secondary)", fontSize: "0.85rem", marginBottom: "20px" }}>Make direct content or keyword updates to this tailored resume. Click save when finished.</p>
+            <div className="input-group" style={{ marginBottom: "20px" }}>
+              <textarea
+                value={editingVersionText}
+                onChange={(e) => setEditingVersionText(e.target.value)}
+                rows={16}
+                className="form-textarea"
+                style={{ width: "100%", fontFamily: "monospace", fontSize: "0.85rem", lineHeight: "1.4", background: "#f8fafc", border: "1px solid var(--border-glass)", color: "var(--text-main)", borderRadius: "6px", padding: "12px" }}
+              ></textarea>
+            </div>
+            <div style={{ display: "flex", gap: "10px", justifyContent: "flex-end" }}>
+              <button className="secondary-btn" style={{ padding: "8px 16px", borderRadius: "6px", background: "transparent", border: "1px solid var(--border-glass)", color: "var(--text-main)", cursor: "pointer" }} onClick={() => {
+                setShowEditorPanel(false);
+                setEditingVersionId(null);
+              }}>Cancel</button>
+              <button className="primary-btn" style={{ padding: "8px 16px", borderRadius: "6px", background: "var(--primary-gradient)", border: "none", color: "#fff", cursor: "pointer", fontWeight: "600" }} onClick={handleUpdateVersion}>Save Updates</button>
+            </div>
+          </div>
         </div>
       )}
     </div>

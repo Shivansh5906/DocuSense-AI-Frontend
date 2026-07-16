@@ -1,32 +1,44 @@
 @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap');
 
 :root {
-  --bg-primary: #030712;
-  --bg-secondary: #0b1528;
-  --bg-glass: rgba(15, 23, 42, 0.55);
-  --border-glass: rgba(255, 255, 255, 0.08);
-  --border-glass-active: rgba(99, 102, 241, 0.4);
+  --bg-primary: #F1F5F9; /* Light Gray main background */
+  --bg-secondary: #F8FAFC; /* Soft Gray side panels/information panels */
+  --bg-card: #FFFFFF; /* White cards and forms */
+  --bg-upload: #ECFDF5; /* Light Mint upload area background */
+  --bg-glass: rgba(255, 255, 255, 0.7);
+  --border-glass: rgba(15, 23, 42, 0.08);
+  --border-glass-active: rgba(5, 150, 105, 0.35); /* Active Emerald border */
   
-  --primary: #4f46e5;
-  --primary-hover: #4338ca;
-  --primary-gradient: linear-gradient(135deg, #6366f1, #3b82f6);
-  --secondary-gradient: linear-gradient(135deg, #a855f7, #ec4899);
-  --success: #10b981;
-  --danger: #ef4444;
+  --primary: #059669; /* Emerald Green */
+  --primary-hover: #047857; /* Dark Emerald */
+  --primary-gradient: linear-gradient(135deg, #059669, #10B981);
+  --secondary-gradient: linear-gradient(135deg, #10B981, #34D399);
   
-  --text-main: #f8fafc;
-  --text-secondary: #94a3b8;
-  --text-muted: #64748b;
+  --success: #10B981; /* Green */
+  --warning: #F59E0B; /* Amber */
+  --danger: #EF4444; /* Red */
+  --info: #0EA5E9; /* Sky Blue */
   
-  --shadow-glow: 0 0 20px rgba(99, 102, 241, 0.15);
-  --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  --text-main: #111827; /* Almost Black headings */
+  --text-secondary: #334155; /* Dark Slate subtitles */
+  --text-body: #475569; /* Slate Gray paragraphs/body text */
+  --text-muted: #94A3B8; /* Cool Gray placeholders/muted text */
+  
+  --border-color: #CBD5E1; /* Light Gray borders/dividers */
+  --border-focus: #059669; /* Emerald focused border */
+  
+  --card-shadow: 0 4px 20px rgba(15, 23, 42, 0.08);
+  --modal-overlay: rgba(17, 24, 39, 0.5);
+  
+  --shadow-glow: 0 8px 30px rgba(5, 150, 105, 0.06);
+  --transition-smooth: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 body {
   margin: 0;
   padding: 0;
   font-family: 'Outfit', sans-serif;
-  background: radial-gradient(circle at 50% 0%, #111827 0%, #030712 100%);
+  background: radial-gradient(circle at 50% 0%, #ffffff 0%, #f1f5f9 100%);
   color: var(--text-main);
   min-height: 100vh;
   overflow-x: hidden;
@@ -41,26 +53,28 @@ body {
   background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(15, 23, 42, 0.12);
   border-radius: 99px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 255, 255, 0.2);
+  background: rgba(15, 23, 42, 0.24);
 }
 
 /* App Workspace Layout */
 .app-container {
   display: flex;
-  height: 100vh;
+  flex: 1;
+  height: auto;
+  min-height: 0;
   width: 100vw;
   overflow: hidden;
-  background: rgba(3, 7, 18, 0.7);
+  background: transparent;
 }
 
 /* Sidebar Layout */
 .sidebar {
   width: 300px;
-  background: rgba(11, 21, 40, 0.85);
+  background: rgba(255, 255, 255, 0.65);
   border-right: 1px solid var(--border-glass);
   display: flex;
   flex-direction: column;
@@ -69,6 +83,7 @@ body {
   backdrop-filter: blur(12px);
   z-index: 10;
   flex-shrink: 0;
+  transition: var(--transition-smooth);
 }
 
 .logo-container {
@@ -182,7 +197,7 @@ body {
   gap: 10px;
   padding: 12px 14px;
   border-radius: 10px;
-  background: rgba(255, 255, 255, 0.02);
+  background: rgba(15, 23, 42, 0.03);
   border: 1px solid transparent;
   cursor: pointer;
   transition: var(--transition-smooth);
@@ -192,7 +207,7 @@ body {
 }
 
 .doc-item:hover {
-  background: rgba(255, 255, 255, 0.05);
+  background: rgba(15, 23, 42, 0.06);
   color: var(--text-main);
   transform: translateX(2px);
 }
@@ -346,7 +361,7 @@ body {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background: rgba(11, 21, 40, 0.4);
+  background: rgba(255, 255, 255, 0.45);
 }
 
 .active-doc-info {
@@ -448,8 +463,12 @@ body {
 }
 
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(6px); }
+  from { opacity: 0; transform: translateY(8px); }
   to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.4s cubic-bezier(0.25, 1, 0.5, 1);
 }
 
 .bubble.user {
