@@ -330,14 +330,14 @@
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  border-bottom: 1px solid var(--border-color);
   padding-bottom: 20px;
   margin-bottom: 20px;
 }
 
 .active-file-tag {
   font-size: 0.75rem;
-  background: rgba(255, 255, 255, 0.05);
+  background: rgba(15, 23, 42, 0.04);
   color: var(--text-secondary);
   padding: 4px 8px;
   border-radius: 6px;
@@ -348,21 +348,21 @@
   margin: 8px 0 0 0;
   font-size: 1.4rem;
   font-weight: 700;
-  color: #fff;
+  color: var(--text-main);
 }
 
 .report-tabs {
   display: flex;
   gap: 8px;
   margin-bottom: 24px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  border-bottom: 1px solid var(--border-color);
   padding-bottom: 10px;
   overflow-x: auto;
   padding-right: 4px;
 }
 
 .report-tab-btn {
-  background: rgba(255, 255, 255, 0.02);
+  background: rgba(15, 23, 42, 0.02);
   border: 1px solid transparent;
   color: var(--text-secondary);
   padding: 10px 16px;
@@ -375,8 +375,8 @@
 }
 
 .report-tab-btn:hover {
-  background: rgba(255, 255, 255, 0.05);
-  color: #fff;
+  background: rgba(15, 23, 42, 0.05);
+  color: var(--text-main);
 }
 
 .report-tab-btn.active {
@@ -417,11 +417,11 @@
   width: 120px;
   height: 120px;
   border-radius: 50%;
-  background: conic-gradient(var(--score-color) var(--score-percent), rgba(255, 255, 255, 0.06) 0deg);
+  background: conic-gradient(var(--score-color) var(--score-percent), rgba(15, 23, 42, 0.08) 0deg);
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 0 16px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.06);
 }
 
 .circle-score-inner {
@@ -554,8 +554,8 @@
 }
 
 .skills-column {
-  background: rgba(255, 255, 255, 0.015);
-  border: 1px solid rgba(255, 255, 255, 0.03);
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
   border-radius: 12px;
   padding: 20px;
 }
@@ -564,7 +564,7 @@
   margin-top: 0;
   margin-bottom: 16px;
   font-size: 1rem;
-  color: #fff;
+  color: var(--text-main);
 }
 
 .skills-bubble-container {
@@ -582,15 +582,15 @@
 }
 
 .pill-match {
-  background: rgba(16, 185, 129, 0.1);
-  border-color: rgba(16, 185, 129, 0.25);
-  color: #34d399;
+  background: rgba(16, 185, 129, 0.08);
+  border-color: rgba(16, 185, 129, 0.2);
+  color: #047857;
 }
 
 .pill-missing {
-  background: rgba(239, 68, 68, 0.1);
-  border-color: rgba(239, 68, 68, 0.25);
-  color: #f87171;
+  background: rgba(239, 68, 68, 0.08);
+  border-color: rgba(239, 68, 68, 0.2);
+  color: #b91c1c;
 }
 
 .no-skills-notice {
@@ -609,7 +609,7 @@
 .additional-gap-details h4 {
   margin-top: 0;
   margin-bottom: 8px;
-  color: #fff;
+  color: var(--text-main);
 }
 
 .additional-gap-details p {
@@ -630,7 +630,7 @@
 .ats-bars-grid h4 {
   margin: 0;
   font-size: 1.1rem;
-  color: #fff;
+  color: var(--text-main);
 }
 
 .bar-stat {
@@ -649,7 +649,7 @@
 .bar-track {
   width: 100%;
   height: 6px;
-  background: rgba(255, 255, 255, 0.05);
+  background: rgba(15, 23, 42, 0.08);
   border-radius: 99px;
   overflow: hidden;
 }
@@ -674,8 +674,8 @@
 }
 
 .ats-detail-card {
-  background: rgba(255, 255, 255, 0.01);
-  border: 1px solid rgba(255, 255, 255, 0.04);
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
   border-radius: 12px;
   padding: 20px;
 }
@@ -683,7 +683,7 @@
 .ats-detail-card h4 {
   margin-top: 0;
   margin-bottom: 14px;
-  color: #fff;
+  color: var(--text-main);
   font-size: 0.95rem;
 }
 
@@ -701,15 +701,15 @@
 }
 
 .badge-found {
-  background: rgba(16, 185, 129, 0.08);
-  border: 1px solid rgba(16, 185, 129, 0.2);
-  color: #34d399;
+  background: rgba(16, 185, 129, 0.06);
+  border: 1px solid rgba(16, 185, 129, 0.18);
+  color: #047857;
 }
 
 .badge-missing {
-  background: rgba(239, 68, 68, 0.08);
-  border: 1px solid rgba(239, 68, 68, 0.2);
-  color: #f87171;
+  background: rgba(239, 68, 68, 0.06);
+  border: 1px solid rgba(239, 68, 68, 0.18);
+  color: #b91c1c;
 }
 
 .compliance-passed {
@@ -724,8 +724,9 @@
 
 .issues-list li {
   margin-bottom: 8px;
-  color: #fca5a5;
+  color: #b91c1c;
   font-size: 0.85rem;
+  font-weight: 500;
   list-style-type: none;
 }
 
@@ -733,7 +734,7 @@
 .keyword-suggestions-section h4 {
   margin-top: 0;
   margin-bottom: 12px;
-  color: #fff;
+  color: var(--text-main);
 }
 
 .keywords-table {
@@ -745,12 +746,12 @@
 .keywords-table th, .keywords-table td {
   padding: 12px;
   text-align: left;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+  border-bottom: 1px solid var(--border-color);
   font-size: 0.88rem;
 }
 
 .keywords-table th {
-  color: var(--text-muted);
+  color: var(--text-body);
   font-weight: 600;
   text-transform: uppercase;
   font-size: 0.75rem;
@@ -769,13 +770,13 @@
 }
 
 .match-ok {
-  background: rgba(16, 185, 129, 0.1);
-  color: #34d399;
+  background: rgba(16, 185, 129, 0.08);
+  color: #047857;
 }
 
 .match-short {
-  background: rgba(245, 158, 11, 0.1);
-  color: #fcd34d;
+  background: rgba(245, 158, 11, 0.08);
+  color: #b45309;
 }
 
 /* Mock Interview Pane Styles */
@@ -817,12 +818,12 @@
   margin-top: 0;
   margin-bottom: 16px;
   font-size: 1.1rem;
-  color: #fff;
+  color: var(--text-main);
   line-height: 1.4;
 }
 
 .question-card-body {
-  border-top: 1px solid rgba(255, 255, 255, 0.04);
+  border-top: 1px solid var(--border-color);
   padding-top: 14px;
   display: flex;
   flex-direction: column;
@@ -833,7 +834,7 @@
   display: block;
   font-size: 0.8rem;
   text-transform: uppercase;
-  color: var(--text-muted);
+  color: var(--text-body);
   margin-bottom: 4px;
 }
 
@@ -845,11 +846,11 @@
 }
 
 .approach-text {
-  background: rgba(15, 23, 42, 0.4);
-  border: 1px solid rgba(255, 255, 255, 0.02);
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
   padding: 12px;
   border-radius: 8px;
-  border-left: 3px solid #6366f1;
+  border-left: 3px solid var(--primary);
 }
 
 /* Bullet Rewriter Styles */
@@ -860,8 +861,8 @@
 }
 
 .rewrite-block {
-  background: rgba(255, 255, 255, 0.01);
-  border: 1px solid rgba(255, 255, 255, 0.03);
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
   border-radius: 14px;
   padding: 24px;
 }
@@ -882,11 +883,12 @@
 
 .rewrite-side {
   flex: 1;
-  background: rgba(15, 23, 42, 0.3);
-  border: 1px solid var(--border-glass);
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
   border-radius: 10px;
   padding: 16px;
   position: relative;
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.02);
 }
 
 .rewrite-side p {
@@ -900,8 +902,8 @@
 }
 
 .suggested-side p {
-  color: #fff;
-  font-weight: 500;
+  color: var(--text-main);
+  font-weight: 600;
 }
 
 .rewrite-divider {
@@ -929,15 +931,15 @@
 }
 
 .badge-orig {
-  background: rgba(239, 68, 68, 0.1);
-  color: #f87171;
-  border: 1px solid rgba(239, 68, 68, 0.2);
+  background: rgba(239, 68, 68, 0.08);
+  color: #b91c1c;
+  border: 1px solid rgba(239, 68, 68, 0.18);
 }
 
 .badge-sugg {
-  background: rgba(16, 185, 129, 0.1);
-  color: #34d399;
-  border: 1px solid rgba(16, 185, 129, 0.2);
+  background: rgba(16, 185, 129, 0.08);
+  color: #047857;
+  border: 1px solid rgba(16, 185, 129, 0.18);
 }
 
 .rewrite-rationale {
@@ -994,9 +996,9 @@
 
 .score-badge {
   font-size: 0.72rem;
-  background: rgba(99, 102, 241, 0.12);
-  color: #a5b4fc;
-  border: 1px solid rgba(99, 102, 241, 0.2);
+  background: rgba(5, 150, 105, 0.08);
+  color: var(--primary);
+  border: 1px solid rgba(5, 150, 105, 0.15);
   padding: 3px 8px;
   border-radius: 4px;
   font-weight: 600;
@@ -1006,7 +1008,7 @@
   margin: 0 0 4px 0;
   font-size: 1.05rem;
   font-weight: 600;
-  color: #fff;
+  color: var(--text-main);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -1065,7 +1067,7 @@
 
 .empty-history-card h3 {
   margin: 0 0 8px 0;
-  color: #fff;
+  color: var(--text-main);
 }
 
 .empty-history-card p {
@@ -1098,8 +1100,9 @@
 }
 
 .secondary-btn-action:hover {
-  border-color: #fff;
-  color: #fff;
+  border-color: var(--primary);
+  color: var(--primary);
+  background: rgba(5, 150, 105, 0.04);
 }
 
 /* Animations helper */
@@ -1130,9 +1133,9 @@
 }
 
 .tone-select {
-  background: #111827;
-  border: 1px solid var(--border-glass);
-  color: #fff;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  color: var(--text-main);
   padding: 6px 12px;
   border-radius: 6px;
   font-size: 0.85rem;
@@ -1141,7 +1144,8 @@
 }
 
 .tone-select option {
-  background: #111827;
+  background: var(--bg-card);
+  color: var(--text-main);
 }
 
 .generate-btn {
@@ -1174,9 +1178,9 @@
 }
 
 .regenerate-btn {
-  background: var(--bg-glass);
-  border: 1px solid var(--border-glass);
-  color: #fff;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  color: var(--text-secondary);
   padding: 5px 10px;
   border-radius: 6px;
   cursor: pointer;
@@ -1184,7 +1188,8 @@
 }
 
 .regenerate-btn:hover {
-  background: rgba(255, 255, 255, 0.05);
+  background: rgba(15, 23, 42, 0.04);
+  color: var(--text-main);
 }
 
 .documents-split-grid {
@@ -1200,17 +1205,18 @@
 }
 
 .result-doc-column {
-  background: rgba(255, 255, 255, 0.01);
-  border: 1px solid var(--border-glass);
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
   border-radius: 12px;
   display: flex;
   flex-direction: column;
   overflow: hidden;
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.04);
 }
 
 .doc-column-header {
-  background: rgba(255, 255, 255, 0.02);
-  border-bottom: 1px solid var(--border-glass);
+  background: var(--bg-secondary);
+  border-bottom: 1px solid var(--border-color);
   padding: 12px 18px;
   display: flex;
   justify-content: space-between;
@@ -1220,13 +1226,13 @@
 .doc-column-header h4 {
   margin: 0;
   font-size: 0.95rem;
-  color: #fff;
+  color: var(--text-main);
 }
 
 .copy-btn {
-  background: rgba(99, 102, 241, 0.15);
-  border: 1px solid rgba(99, 102, 241, 0.3);
-  color: #818cf8;
+  background: rgba(5, 150, 105, 0.08);
+  border: 1px solid rgba(5, 150, 105, 0.2);
+  color: var(--primary);
   padding: 6px 12px;
   border-radius: 6px;
   font-size: 0.75rem;
@@ -1236,13 +1242,15 @@
 }
 
 .copy-btn:hover {
-  background: rgba(99, 102, 241, 0.25);
-  color: #fff;
+  background: var(--primary-gradient);
+  color: white;
+  border-color: transparent;
 }
 
 .doc-content-display {
   padding: 18px;
-  background: rgba(0, 0, 0, 0.2);
+  background: #F8FAFC;
+  border-top: none;
   min-height: 350px;
   max-height: 600px;
   overflow-y: auto;
