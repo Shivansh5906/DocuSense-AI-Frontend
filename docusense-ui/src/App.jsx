@@ -41,6 +41,11 @@ export default function App() {
     }
   }, [documents, invalidFile]);
 
+  // Warm up sleeping Render backend on page load
+  useEffect(() => {
+    api.get("/health").catch(() => {});
+  }, []);
+
   // Fetch unique documents list on load or when refreshKey/user changes, with 3s polling for status updates
   useEffect(() => {
     if (!user) return;

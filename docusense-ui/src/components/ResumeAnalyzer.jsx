@@ -471,11 +471,13 @@ export default function ResumeAnalyzer({ documents: allDocs = [], selectedFilena
                   </label>
                   {uploadLoading && (
                     <div className="inline-progress-wrapper" style={{ marginTop: "12px" }}>
-                      <div className="progress-text-label" style={{ fontSize: "0.8rem", color: "var(--text-secondary)", marginBottom: "4px", textAlign: "left" }}>
-                        Uploading: {uploadProgress}%
+                      <div className="progress-text-label" style={{ fontSize: "0.8rem", color: "var(--text-secondary)", marginBottom: "4px", textAlign: "left", fontWeight: "500" }}>
+                        {uploadProgress >= 95 
+                          ? "⏳ Processing document & connecting to server..." 
+                          : `Uploading: ${uploadProgress}%`}
                       </div>
                       <div className="progress-bar-track" style={{ height: "6px", background: "rgba(15, 23, 42, 0.08)", borderRadius: "3px", overflow: "hidden" }}>
-                        <div className="progress-bar-fill" style={{ width: `${uploadProgress}%`, height: "100%", background: "var(--success)", transition: "width 0.2s ease" }}></div>
+                        <div className="progress-bar-fill" style={{ width: `${uploadProgress}%`, height: "100%", background: uploadProgress >= 95 ? "linear-gradient(90deg, #10b981, #6366f1)" : "var(--primary)", transition: "width 0.2s ease" }}></div>
                       </div>
                     </div>
                   )}
