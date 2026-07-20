@@ -1318,3 +1318,24 @@
   font-size: 0.9rem;
   color: var(--text-muted);
 }
+
+/* Responsive enhancements for ResumeAnalyzer */
+@media (max-width: 768px) {
+  .documents-split-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+  .analyzer-setup-card {
+    padding: 16px;
+  }
+  .input-row {
+    flex-direction: column;
+    gap: 12px;
+  }
+  .doc-content-display {
+    min-height: 200px;
+    max-height: 400px;
+    padding: 12px;
+  }
+}

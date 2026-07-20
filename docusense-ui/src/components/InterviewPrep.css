@@ -146,3 +146,12 @@
 .q-approach p {
   margin: 4px 0 0 0;
 }
+
+@media (max-width: 600px) {
+  .interview-prep-workshop {
+    padding: 15px 10px;
+  }
+  .input-card, .results-card {
+    padding: 16px;
+  }
+}

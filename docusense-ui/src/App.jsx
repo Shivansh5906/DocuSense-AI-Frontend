@@ -23,7 +23,15 @@ export default function App() {
   const [invalidFile, setInvalidFile] = useState(null);
   const [activeView, setActiveView] = useState("landing"); // "landing", "builder", "matcher", "cover_letter", "review", "linkedin", "templates", "examples", "pricing", "blog"
   const [selectedTemplate, setSelectedTemplate] = useState("modern");
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
   const showSidebarLayout = !["landing", "pricing", "blog", "templates", "examples", "builder_select_template", "builder"].includes(activeView);
+
+  const navigateTo = (view) => {
+    setActiveView(view);
+    setIsMobileMenuOpen(false);
+    setIsMobileSidebarOpen(false);
+  };
 
   // Monitor for document validation failure to prompt user
   useEffect(() => {
@@ -100,9 +108,9 @@ export default function App() {
 
   return (
     <div className="app-main-layout">
-      {/* 1. Header Navigation Bar ( modeled after premium resume systems ) */}
+      {/* 1. Header Navigation Bar ( responsive mobile drawer ready ) */}
       <header className="app-top-navbar">
-        <div className="navbar-logo" onClick={() => setActiveView("landing")}>
+        <div className="navbar-logo" onClick={() => navigateTo("landing")}>
           <div className="logo-icon-small">D</div>
           <div className="logo-text-group">
             <span className="logo-bold">Docu</span>
@@ -110,20 +118,29 @@ export default function App() {
           </div>
         </div>
 
-        <nav className="navbar-nav-links">
-          <button className={`nav-link-btn ${activeView === "landing" ? "active" : ""}`} onClick={() => setActiveView("landing")}>Home</button>
-          <button className={`nav-link-btn ${["builder", "builder_select_template"].includes(activeView) ? "active" : ""}`} onClick={() => setActiveView("builder_select_template")}>Resume Builder</button>
-          <button className={`nav-link-btn ${activeView === "review" ? "active" : ""}`} onClick={() => setActiveView("review")}>ATS & Matcher</button>
-          <button className={`nav-link-btn ${activeView === "cover_letter" ? "active" : ""}`} onClick={() => setActiveView("cover_letter")}>Cover Letter AI</button>
-          <button className={`nav-link-btn ${activeView === "linkedin" ? "active" : ""}`} onClick={() => setActiveView("linkedin")}>LinkedIn AI</button>
-          <button className={`nav-link-btn ${activeView === "interview_prep" ? "active" : ""}`} onClick={() => setActiveView("interview_prep")}>Interview & Tools</button>
+        <button 
+          className="mobile-menu-toggle" 
+          onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+          aria-label="Toggle Navigation Menu"
+        >
+          {isMobileMenuOpen ? "✕" : "☰"}
+        </button>
+
+        <div 
+          className={`mobile-nav-backdrop ${isMobileMenuOpen ? "open" : ""}`} 
+          onClick={() => setIsMobileMenuOpen(false)} 
+        />
+
+        <nav className={`navbar-nav-links ${isMobileMenuOpen ? "mobile-open" : ""}`}>
+          <button className={`nav-link-btn ${activeView === "landing" ? "active" : ""}`} onClick={() => navigateTo("landing")}>Home</button>
+          <button className={`nav-link-btn ${["builder", "builder_select_template"].includes(activeView) ? "active" : ""}`} onClick={() => navigateTo("builder_select_template")}>Resume Builder</button>
+          <button className={`nav-link-btn ${activeView === "review" ? "active" : ""}`} onClick={() => navigateTo("review")}>ATS & Matcher</button>
+          <button className={`nav-link-btn ${activeView === "cover_letter" ? "active" : ""}`} onClick={() => navigateTo("cover_letter")}>Cover Letter AI</button>
+          <button className={`nav-link-btn ${activeView === "linkedin" ? "active" : ""}`} onClick={() => navigateTo("linkedin")}>LinkedIn AI</button>
+          <button className={`nav-link-btn ${activeView === "interview_prep" ? "active" : ""}`} onClick={() => navigateTo("interview_prep")}>Interview & Tools</button>
         </nav>
 
         <div className="navbar-right-controls">
-
-
-
-
           <div className="user-profile-badge-nav">
             <div className="avatar-circle-nav">
               {user.name ? user.name.charAt(0).toUpperCase() : "U"}
@@ -139,9 +156,12 @@ export default function App() {
       {/* Main Grid Wrapper */}
       <div className="app-container">
         {/* Collapsible Documents Sidebar */}
-        <aside className={`sidebar ${showSidebarLayout ? "" : "collapsed"}`}>
+        <aside className={`sidebar ${showSidebarLayout ? "" : "collapsed"} ${isMobileSidebarOpen ? "mobile-drawer-open" : ""}`}>
           <div className="doc-section">
-            <div className="section-title">Uploaded Base CVs</div>
+            <div className="section-title">
+              Uploaded Base CVs
+              <button className="mobile-sidebar-close" onClick={() => setIsMobileSidebarOpen(false)}>✕</button>
+            </div>
             <div className="doc-list">
               {documents.length === 0 ? (
                 <div className="no-docs">No CVs uploaded yet</div>
@@ -152,6 +172,7 @@ export default function App() {
                     onClick={() => {
                       if (doc.status !== "failed") {
                         setSelectedFilename(doc.filename);
+                        setIsMobileSidebarOpen(false);
                       }
                     }}
                     className={`doc-item ${selectedFilename === doc.filename ? "active" : ""} ${doc.status === "indexing" ? "doc-indexing" : ""} ${doc.status === "failed" ? "doc-failed" : ""}`}
@@ -183,13 +204,23 @@ export default function App() {
               )}
             </div>
           </div>
-
-
         </aside>
+
+        {isMobileSidebarOpen && (
+          <div className="mobile-sidebar-backdrop" onClick={() => setIsMobileSidebarOpen(false)} />
+        )}
 
         {/* Main Workspace Area */}
         <main className="main-workspace">
           <header className="workspace-header">
+            {showSidebarLayout && (
+              <button 
+                className="mobile-sidebar-toggle-btn"
+                onClick={() => setIsMobileSidebarOpen(!isMobileSidebarOpen)}
+              >
+                📁 {selectedFilename ? selectedFilename : "Base CVs"}
+              </button>
+            )}
             <div className="active-doc-info">
               <span className="active-doc-label">Workspace:</span>
               <span className="active-doc-title">
@@ -274,7 +305,7 @@ export default function App() {
                   <h2 style={{ color: "var(--text-main)" }}>🎨 Select Resume Template</h2>
                   <p style={{ color: "var(--text-secondary)", fontSize: "0.95rem" }}>Select a layout structure to get started building your resume.</p>
                 </div>
-                <div className="templates-showcase-grid" style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "24px" }}>
+                <div className="templates-showcase-grid">
                   <div className="template-card card" style={{ padding: "24px", cursor: "pointer", background: "var(--bg-card)", border: "1px solid var(--border-color)", borderRadius: "12px", transition: "var(--transition-smooth)" }} onClick={() => { setSelectedTemplate("modern"); setActiveView("builder"); }}>
                     <div style={{ background: "#111827", height: "180px", borderRadius: "8px", marginBottom: "15px", display: "flex", alignItems: "center", justifyContent: "center", border: "1px solid var(--border-color)", fontSize: "3rem" }}>
                       📄
@@ -306,7 +337,7 @@ export default function App() {
                   <h2>📂 Pre-filled Resume Examples</h2>
                   <p style={{ color: "var(--text-secondary)", fontSize: "0.95rem" }}>Load a specialized mock profile into your editor workspace to see layout formats.</p>
                 </div>
-                <div className="templates-showcase-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "24px" }}>
+                <div className="examples-showcase-grid">
                   <div className="card" style={{ padding: "24px", background: "var(--bg-glass)", border: "1px solid var(--border-glass)", borderRadius: "12px" }}>
                     <h3 style={{ color: "#fff", marginBottom: "10px" }}>Senior Software Engineer</h3>
                     <p style={{ fontSize: "0.9rem", color: "var(--text-secondary)", marginBottom: "20px", lineHeight: "1.5" }}>Features advanced React, TypeScript stack details, bundle reductions, and team management accomplishments.</p>

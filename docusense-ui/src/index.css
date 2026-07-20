@@ -1,1 +1,32 @@
-/* index.css */
+/* index.css - Global responsive resets and helpers */
+
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  max-width: 100vw;
+  overflow-x: hidden;
+  -webkit-tap-highlight-color: transparent;
+  text-size-adjust: 100%;
+}
+
+img, svg, canvas, video, iframe {
+  max-width: 100%;
+  height: auto;
+}
+
+button, input, select, textarea {
+  font-family: inherit;
+  font-size: inherit;
+}
+
+/* Touch-friendly touch target utilities */
+@media (max-width: 768px) {
+  button, input[type="button"], input[type="submit"], a.nav-link-btn {
+    min-height: 44px;
+  }
+}

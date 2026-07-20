@@ -156,6 +156,7 @@ export default function ResumeBuilder({ selectedFilename, onSaveSuccess, initial
   const [showSaveModal, setShowSaveModal] = useState(false);
   const [saveVersionName, setSaveVersionName] = useState("");
   const [saving, setSaving] = useState(false);
+  const [mobileActiveView, setMobileActiveView] = useState("edit"); // "edit" or "preview"
 
   // Initialize with software engineer example so it doesn't start completely blank
   useEffect(() => {
@@ -325,7 +326,23 @@ export default function ResumeBuilder({ selectedFilename, onSaveSuccess, initial
         </div>
       </div>
 
-      <div className="builder-workspace-grid">
+      {/* Mobile view tab switcher */}
+      <div className="mobile-builder-mode-switcher">
+        <button 
+          className={`mobile-mode-btn ${mobileActiveView === "edit" ? "active" : ""}`}
+          onClick={() => setMobileActiveView("edit")}
+        >
+          ✏️ Edit Sections
+        </button>
+        <button 
+          className={`mobile-mode-btn ${mobileActiveView === "preview" ? "active" : ""}`}
+          onClick={() => setMobileActiveView("preview")}
+        >
+          👁️ Live Preview
+        </button>
+      </div>
+
+      <div className={`builder-workspace-grid mobile-mode-${mobileActiveView}`}>
         {/* Left Side: Accordion Input Form */}
         <div className="builder-form-panel card">
           <div className="form-tabs-headers">
