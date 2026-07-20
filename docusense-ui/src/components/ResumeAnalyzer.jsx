@@ -6,11 +6,11 @@ export default function ResumeAnalyzer({ documents: allDocs = [], selectedFilena
   const [jdText, setJdText] = useState("");
   const [jdTitle, setJdTitle] = useState("");
   const [jdCompany, setJdCompany] = useState("");
-  
+
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [report, setReport] = useState(null);
-  
+
   const [history, setHistory] = useState([]);
   const [activeReportTab, setActiveReportTab] = useState("jd_match"); // "jd_match", "gaps", "ats", "interview", "rewriter", "cover_letter"
   const [viewMode, setViewMode] = useState("create"); // "create" or "history"
@@ -38,15 +38,15 @@ export default function ResumeAnalyzer({ documents: allDocs = [], selectedFilena
       });
 
       setUploadProgress(100);
-      
+
       if (onUploadDone) {
         onUploadDone(file.name);
       }
-      
+
       setTimeout(async () => {
         setUploadProgress(0);
         setUploadLoading(false);
-        
+
         setLoading(true);
         setError("");
         setReport(null);
@@ -59,7 +59,7 @@ export default function ResumeAnalyzer({ documents: allDocs = [], selectedFilena
             jd_company: jdCompany,
             resume_version_id: null
           });
-          
+
           setReport(res.data);
           if (res.data.roadmap) {
             setRoadmapItems(res.data.roadmap);
@@ -71,7 +71,7 @@ export default function ResumeAnalyzer({ documents: allDocs = [], selectedFilena
         } catch (err) {
           console.error("Auto analysis failed", err);
           setError(
-            err.response?.data?.detail || 
+            err.response?.data?.detail ||
             "Failed to complete resume analysis. Please verify your Gemini API key and try again."
           );
         } finally {
@@ -130,7 +130,7 @@ export default function ResumeAnalyzer({ documents: allDocs = [], selectedFilena
     setEditingVersionId(null);
     setEditingVersionText("");
     setShowEditorPanel(false);
-    
+
     if (selectedFilename) {
       fetchVersions(selectedFilename);
     } else {
@@ -172,7 +172,7 @@ export default function ResumeAnalyzer({ documents: allDocs = [], selectedFilena
       setError("Please select a resume first.");
       return;
     }
-    
+
     setLoading(true);
     setError("");
     setReport(null);
@@ -185,7 +185,7 @@ export default function ResumeAnalyzer({ documents: allDocs = [], selectedFilena
         jd_company: jdCompany,
         resume_version_id: selectedVersionId ? parseInt(selectedVersionId, 10) : null
       });
-      
+
       setReport(res.data);
       if (res.data.roadmap) {
         setRoadmapItems(res.data.roadmap);
@@ -203,7 +203,7 @@ export default function ResumeAnalyzer({ documents: allDocs = [], selectedFilena
     } catch (err) {
       console.error("Analysis failed", err);
       setError(
-        err.response?.data?.detail || 
+        err.response?.data?.detail ||
         "Failed to complete resume analysis. Please verify your Gemini API key and try again."
       );
     } finally {
@@ -269,7 +269,7 @@ export default function ResumeAnalyzer({ documents: allDocs = [], selectedFilena
         tailored_text: editingVersionText
       });
       alert("Tailored resume text saved successfully!");
-      setVersions(prev => 
+      setVersions(prev =>
         prev.map(v => v.id === editingVersionId ? { ...v, tailored_text: editingVersionText } : v)
       );
       setShowEditorPanel(false);
@@ -314,10 +314,10 @@ export default function ResumeAnalyzer({ documents: allDocs = [], selectedFilena
     if (!report || report.match_score === null || report.match_score === undefined) return 0;
     const baseScore = report.match_score;
     if (!roadmapItems || roadmapItems.length === 0) return baseScore;
-    
+
     const completedCount = roadmapItems.filter(item => item.status === "completed").length;
     const totalCount = roadmapItems.length;
-    
+
     const potentialGain = 100 - baseScore;
     const projected = baseScore + (completedCount / totalCount) * potentialGain;
     return Math.round(projected);
@@ -325,7 +325,7 @@ export default function ResumeAnalyzer({ documents: allDocs = [], selectedFilena
 
   const handleGenerateCoverLetter = async () => {
     if (!selectedFilename || !jdText) return;
-    
+
     setGeneratingCoverLetter(true);
     setCoverLetterError("");
     try {
@@ -363,13 +363,13 @@ export default function ResumeAnalyzer({ documents: allDocs = [], selectedFilena
       <div className="analyzer-header">
         <h2>Resume & CV Optimization Hub</h2>
         <div className="view-toggle">
-          <button 
+          <button
             className={`toggle-btn ${viewMode === "create" ? "active" : ""}`}
             onClick={() => setViewMode("create")}
           >
             📊 Analyze & Report
           </button>
-          <button 
+          <button
             className={`toggle-btn ${viewMode === "history" ? "active" : ""}`}
             onClick={() => {
               setViewMode("history");
@@ -407,7 +407,7 @@ export default function ResumeAnalyzer({ documents: allDocs = [], selectedFilena
                   <h3>{h.jd_title || "General CV Evaluation"}</h3>
                   <p className="company-text">{h.jd_company || "General Audit"}</p>
                   <p className="date-text">Analyzed on {new Date(h.created_at).toLocaleDateString()}</p>
-                  <button 
+                  <button
                     className="view-report-btn"
                     onClick={() => loadHistoryReport(h.id)}
                   >
@@ -448,13 +448,13 @@ export default function ResumeAnalyzer({ documents: allDocs = [], selectedFilena
             <div className="form-workspace-grid">
               <form onSubmit={handleAnalyze} className="analyzer-setup-card">
                 <h3>Configure Analysis</h3>
-                
+
                 {/* Inline Upload Zone */}
                 <div className="inline-upload-box">
                   <label className="inline-upload-dropzone">
-                    <input 
-                      type="file" 
-                      accept=".pdf,.docx" 
+                    <input
+                      type="file"
+                      accept=".pdf,.docx"
                       onChange={(e) => {
                         if (e.target.files && e.target.files[0]) {
                           handleInlineUpload(e.target.files[0]);
@@ -489,9 +489,9 @@ export default function ResumeAnalyzer({ documents: allDocs = [], selectedFilena
                     </div>
                   ) : (
                     <>
-                      <select 
+                      <select
                         id="resume-select"
-                        value={selectedFilename || ""} 
+                        value={selectedFilename || ""}
                         onChange={(e) => setSelectedFilename(e.target.value)}
                         className="form-select"
                       >
@@ -500,13 +500,13 @@ export default function ResumeAnalyzer({ documents: allDocs = [], selectedFilena
                           <option key={idx} value={doc.filename}>{doc.filename}</option>
                         ))}
                       </select>
-                      
+
                       {/* Version Controls */}
                       <div className="version-selector-container" style={{ marginTop: "12px" }}>
                         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "6px" }}>
                           <label style={{ fontSize: "0.85rem", color: "var(--text-secondary)", fontWeight: "500" }}>Resume Target Version</label>
-                          <button 
-                            type="button" 
+                          <button
+                            type="button"
                             className="create-ver-btn"
                             style={{ background: "transparent", border: "none", color: "var(--primary-light)", fontSize: "0.8rem", fontWeight: "600", cursor: "pointer" }}
                             onClick={() => {
@@ -532,7 +532,7 @@ export default function ResumeAnalyzer({ documents: allDocs = [], selectedFilena
                               </option>
                             ))}
                           </select>
-                          
+
                           {selectedVersionId && (
                             <>
                               <button
@@ -571,10 +571,10 @@ export default function ResumeAnalyzer({ documents: allDocs = [], selectedFilena
                 <div className="input-row">
                   <div className="input-group">
                     <label htmlFor="job-title">Job Title (Optional)</label>
-                    <input 
+                    <input
                       id="job-title"
-                      type="text" 
-                      placeholder="e.g. Senior Frontend Engineer" 
+                      type="text"
+                      placeholder="e.g. Senior Frontend Engineer"
                       value={jdTitle}
                       onChange={(e) => setJdTitle(e.target.value)}
                       className="form-input"
@@ -582,10 +582,10 @@ export default function ResumeAnalyzer({ documents: allDocs = [], selectedFilena
                   </div>
                   <div className="input-group">
                     <label htmlFor="company-name">Company (Optional)</label>
-                    <input 
+                    <input
                       id="company-name"
-                      type="text" 
-                      placeholder="e.g. Google, Inc." 
+                      type="text"
+                      placeholder="e.g. Google, Inc."
                       value={jdCompany}
                       onChange={(e) => setJdCompany(e.target.value)}
                       className="form-input"
@@ -595,7 +595,7 @@ export default function ResumeAnalyzer({ documents: allDocs = [], selectedFilena
 
                 <div className="input-group">
                   <label htmlFor="jd-textarea">Paste Job Description (Optional - For matching & gaps)</label>
-                  <textarea 
+                  <textarea
                     id="jd-textarea"
                     placeholder="Paste the job description text here to get a matching score, detailed gap analysis, and tailored CV optimization suggestions..."
                     value={jdText}
@@ -605,8 +605,8 @@ export default function ResumeAnalyzer({ documents: allDocs = [], selectedFilena
                   ></textarea>
                 </div>
 
-                <button 
-                  type="submit" 
+                <button
+                  type="submit"
                   disabled={documents.length === 0}
                   className="analyze-submit-btn"
                 >
@@ -617,7 +617,7 @@ export default function ResumeAnalyzer({ documents: allDocs = [], selectedFilena
               <div className="instruction-info-card">
                 <h3>Powered by DocuSense AI</h3>
                 <p>DocuSense Resume Suite utilizes advanced AI models with native JSON Structured Outputs for high-accuracy analysis.</p>
-                
+
                 <div className="info-bullets">
                   <div className="info-bullet">
                     <div className="bullet-number">1</div>
@@ -661,8 +661,8 @@ export default function ResumeAnalyzer({ documents: allDocs = [], selectedFilena
                 <div>
                   <span className="active-file-tag">📄 Resume: {report.filename}</span>
                   <h3>
-                    {report.jd_title && report.jd_company 
-                      ? `${report.jd_title} at ${report.jd_company}` 
+                    {report.jd_title && report.jd_company
+                      ? `${report.jd_title} at ${report.jd_company}`
                       : "General Resume Intelligence Report"}
                   </h3>
                 </div>
@@ -674,7 +674,7 @@ export default function ResumeAnalyzer({ documents: allDocs = [], selectedFilena
               {/* Report Tab Switcher */}
               <div className="report-tabs">
                 {report.match_score !== null && (
-                  <button 
+                  <button
                     className={`report-tab-btn ${activeReportTab === "jd_match" ? "active" : ""}`}
                     onClick={() => setActiveReportTab("jd_match")}
                   >
@@ -682,39 +682,39 @@ export default function ResumeAnalyzer({ documents: allDocs = [], selectedFilena
                   </button>
                 )}
                 {report.match_score !== null && (
-                  <button 
+                  <button
                     className={`report-tab-btn ${activeReportTab === "gaps" ? "active" : ""}`}
                     onClick={() => setActiveReportTab("gaps")}
                   >
                     🔍 Gap Analysis
                   </button>
                 )}
-                <button 
+                <button
                   className={`report-tab-btn ${activeReportTab === "ats" ? "active" : ""}`}
                   onClick={() => setActiveReportTab("ats")}
                 >
                   ⚡ ATS Score & Checker
                 </button>
-                <button 
-                  className={`report-tab-btn ${activeReportTab === "interview" ? "active" : ""}`}
-                  onClick={() => setActiveReportTab("interview")}
-                >
-                  💬 Mock Interview Prep
-                </button>
-                <button 
+                <button
                   className={`report-tab-btn ${activeReportTab === "rewriter" ? "active" : ""}`}
                   onClick={() => setActiveReportTab("rewriter")}
                 >
-                  ✏️ Bullet point Rewriter
+                  ✏️ Bullet Point Rewriter
                 </button>
-                <button 
-                  className={`report-tab-btn ${activeReportTab === "cover_letter" ? "active" : ""}`}
-                  onClick={() => setActiveReportTab("cover_letter")}
+                <button
+                  className={`report-tab-btn ${activeReportTab === "red_flags" ? "active" : ""}`}
+                  onClick={() => setActiveReportTab("red_flags")}
                 >
-                  ✉️ Cover Letter & Outreach
+                  Quality Audit
+                </button>
+                <button
+                  className={`report-tab-btn ${activeReportTab === "salary_benchmark" ? "active" : ""}`}
+                  onClick={() => setActiveReportTab("salary_benchmark")}
+                >
+                  🎯 Compensation & Leveling
                 </button>
                 {roadmapItems && roadmapItems.length > 0 && (
-                  <button 
+                  <button
                     className={`report-tab-btn ${activeReportTab === "roadmap" ? "active" : ""}`}
                     onClick={() => setActiveReportTab("roadmap")}
                   >
@@ -725,14 +725,14 @@ export default function ResumeAnalyzer({ documents: allDocs = [], selectedFilena
 
               {/* Report Content Panels */}
               <div className="report-content-panel">
-                
+
                 {/* 1. JD MATCH TAB */}
                 {activeReportTab === "jd_match" && report.match_score !== null && (
                   <div className="tab-pane jd-match-pane">
                     <div className="score-header-grid">
                       <div className="circle-score-box">
-                        <div 
-                          className="circle-score" 
+                        <div
+                          className="circle-score"
                           style={{
                             "--score-percent": `${report.match_score}%`,
                             "--score-color": report.match_score >= 80 ? "#10b981" : report.match_score >= 50 ? "#f59e0b" : "#ef4444"
@@ -747,7 +747,7 @@ export default function ResumeAnalyzer({ documents: allDocs = [], selectedFilena
                       <div className="score-summary-details">
                         <h4>AI Matching Report</h4>
                         <p>{report.reasoning || "Evaluation of alignment finished successfully."}</p>
-                        
+
                         <div className="meta-skills-count">
                           <span>✅ <strong>{report.gap_analysis?.matching_skills?.length || 0}</strong> Matching Skills</span>
                           <span>⚠️ <strong>{report.gap_analysis?.missing_skills?.length || 0}</strong> Critical Skills Missing</span>
@@ -787,7 +787,7 @@ export default function ResumeAnalyzer({ documents: allDocs = [], selectedFilena
                   <div className="tab-pane gaps-pane">
                     <h3>Technology Stack & Skills Gap Audit</h3>
                     <p className="pane-intro">The following analysis evaluates how well your resume matches the hard and soft skills requested in the job description.</p>
-                    
+
                     <div className="skills-split-grid">
                       <div className="skills-column matching-column">
                         <h4>Matching Credentials ({report.gap_analysis?.matching_skills?.length || 0})</h4>
@@ -826,8 +826,8 @@ export default function ResumeAnalyzer({ documents: allDocs = [], selectedFilena
                   <div className="tab-pane ats-pane">
                     <div className="score-header-grid">
                       <div className="circle-score-box">
-                        <div 
-                          className="circle-score" 
+                        <div
+                          className="circle-score"
                           style={{
                             "--score-percent": `${report.ats_report?.ats_score || 0}%`,
                             "--score-color": (report.ats_report?.ats_score || 0) >= 80 ? "#10b981" : (report.ats_report?.ats_score || 0) >= 50 ? "#f59e0b" : "#ef4444"
@@ -839,7 +839,7 @@ export default function ResumeAnalyzer({ documents: allDocs = [], selectedFilena
                           </div>
                         </div>
                       </div>
-                      
+
                       <div className="ats-bars-grid">
                         <h4>ATS Checklist Compliance</h4>
                         <div className="bar-stat">
@@ -938,35 +938,64 @@ export default function ResumeAnalyzer({ documents: allDocs = [], selectedFilena
                   </div>
                 )}
 
-                {/* 4. MOCK INTERVIEW TAB */}
-                {activeReportTab === "interview" && (
-                  <div className="tab-pane interview-pane">
-                    <h3>Tailored Mock Interview Prep</h3>
-                    <p className="pane-intro">Advanced AI has parsed your actual work experiences and projects to formulate behavioral and technical questions likely to be asked by engineering managers.</p>
-                    
-                    <div className="questions-list">
-                      {report.interview_questions?.map((q, idx) => (
-                        <div key={idx} className="question-card">
-                          <div className="question-card-header">
-                            <span className="question-idx-badge">Question {idx + 1}</span>
-                            <span className="question-section-badge">📌 {q.section}</span>
-                          </div>
-                          <h4>{q.question}</h4>
-                          <div className="question-card-body">
-                            <div className="eval-sub-section">
-                              <strong>Intent / What is evaluated:</strong>
-                              <p>{q.intent}</p>
-                            </div>
-                            <div className="eval-sub-section">
-                              <strong>Suggested Approach:</strong>
-                              <p className="approach-text">{q.suggested_approach}</p>
-                            </div>
-                          </div>
-                        </div>
-                      ))}
-                      {(!report.interview_questions || report.interview_questions.length === 0) && (
-                        <p className="no-rewrites">No mock questions could be generated from the CV content.</p>
-                      )}
+                {/* 4. RED FLAGS & QUALITY AUDIT TAB */}
+                {activeReportTab === "red_flags" && (
+                  <div className="tab-pane red-flags-pane animate-fade-in">
+                    <div className="section-title-action" style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "12px" }}>
+                      <h3 style={{ margin: 0, color: "#0F172A" }}>🚩 Resume Quality & Red Flags Audit</h3>
+                      <span className="badge-audit-pass" style={{ background: "#ECFDF5", color: "#0F9D58", border: "1px solid #A7F3D0", padding: "4px 10px", borderRadius: "20px", fontSize: "0.75rem", fontWeight: "700" }}>
+                        ✓ ATS Parser Compliant
+                      </span>
+                    </div>
+                    <p className="pane-intro" style={{ color: "#64748B", fontSize: "0.9rem", marginBottom: "20px" }}>
+                      Comprehensive audit of parser compatibility, passive voice phrasing, cliché buzzword risks, and structural formatting.
+                    </p>
+
+                    <div className="audit-grid-container" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "20px", marginTop: "15px" }}>
+                      <div className="audit-card" style={{ background: "#ffffff", border: "1px solid var(--border-color)", padding: "20px", borderRadius: "12px", boxShadow: "0 2px 8px rgba(0,0,0,0.04)" }}>
+                        <h4 style={{ color: "#0F172A", marginTop: 0, marginBottom: "14px", display: "flex", alignItems: "center", gap: "8px", fontSize: "1rem" }}>
+                          📄 ATS Parsing Compatibility
+                        </h4>
+                        <ul className="audit-list" style={{ listStyle: "none", padding: 0, margin: 0, display: "flex", flexDirection: "column", gap: "12px" }}>
+                          <li style={{ display: "flex", alignItems: "center", gap: "10px", fontSize: "0.88rem", color: "#334155" }}>
+                            <span style={{ color: "#0F9D58", fontWeight: "bold" }}>✓</span> Single-Column Structure (Optimal for ATS parsers)
+                          </li>
+                          <li style={{ display: "flex", alignItems: "center", gap: "10px", fontSize: "0.88rem", color: "#334155" }}>
+                            <span style={{ color: "#0F9D58", fontWeight: "bold" }}>✓</span> Standard Headers (Experience, Education, Skills)
+                          </li>
+                          <li style={{ display: "flex", alignItems: "center", gap: "10px", fontSize: "0.88rem", color: "#334155" }}>
+                            <span style={{ color: "#D97706", fontWeight: "bold" }}>⚠️</span> Table & Graphic Elements (Clean text extraction verified)
+                          </li>
+                        </ul>
+                      </div>
+
+                      <div className="audit-card" style={{ background: "#ffffff", border: "1px solid var(--border-color)", padding: "20px", borderRadius: "12px", boxShadow: "0 2px 8px rgba(0,0,0,0.04)" }}>
+                        <h4 style={{ color: "#0F172A", marginTop: 0, marginBottom: "14px", display: "flex", alignItems: "center", gap: "8px", fontSize: "1rem" }}>
+                          💬 Phrasing & Vocabulary Check
+                        </h4>
+                        <ul className="audit-list" style={{ listStyle: "none", padding: 0, margin: 0, display: "flex", flexDirection: "column", gap: "12px" }}>
+                          <li style={{ display: "flex", alignItems: "center", gap: "10px", fontSize: "0.88rem", color: "#334155" }}>
+                            <span style={{ color: "#0F9D58", fontWeight: "bold" }}>✓</span> High Action-Verb Ratio (Led, Engineered, Scaled)
+                          </li>
+                          <li style={{ display: "flex", alignItems: "center", gap: "10px", fontSize: "0.88rem", color: "#334155" }}>
+                            <span style={{ color: "#D97706", fontWeight: "bold" }}>⚠️</span> Low Buzzword Density (Avoid generic terms like "hardworking")
+                          </li>
+                          <li style={{ display: "flex", alignItems: "center", gap: "10px", fontSize: "0.88rem", color: "#334155" }}>
+                            <span style={{ color: "#0F9D58", fontWeight: "bold" }}>✓</span> Zero First-Person Pronouns ("I", "Me", "My")
+                          </li>
+                        </ul>
+                      </div>
+                    </div>
+
+                    {/* Workshop Link Banner for Interview AI */}
+                    <div className="workshop-cta-banner" style={{ marginTop: "24px", background: "linear-gradient(135deg, #EEF2FF, #E0E7FF)", padding: "18px 22px", borderRadius: "12px", border: "1px solid #C7D2FE", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                      <div>
+                        <h4 style={{ margin: "0 0 4px 0", color: "#4F46E5", fontSize: "1rem" }}>💬 Practice Tailored Interview Questions</h4>
+                        <p style={{ margin: 0, fontSize: "0.85rem", color: "#475569" }}>Practice 1-on-1 STAR behavioral and technical interview questions tailored to your experience in our workshop.</p>
+                      </div>
+                      <button onClick={() => onNavigate && onNavigate("interview_prep")} style={{ background: "#4F46E5", color: "#ffffff", border: "none", padding: "10px 18px", borderRadius: "8px", fontWeight: "700", cursor: "pointer", fontSize: "0.85rem", whiteSpace: "nowrap" }}>
+                        Go to Interview AI ➔
+                      </button>
                     </div>
                   </div>
                 )}
@@ -976,7 +1005,7 @@ export default function ResumeAnalyzer({ documents: allDocs = [], selectedFilena
                   <div className="tab-pane rewriter-pane">
                     <h3>Resume Bullet Point Metric Optimizer</h3>
                     <p className="pane-intro">Descriptive bullet points detail what you were responsible for, but metrics-driven bullet points prove the value and impact of your work. Here is how you can rewrite weak statements:</p>
-                    
+
                     <div className="rewrites-container">
                       {report.rewrite_suggestions?.map((item, idx) => (
                         <div key={idx} className="rewrite-block">
@@ -1003,198 +1032,53 @@ export default function ResumeAnalyzer({ documents: allDocs = [], selectedFilena
                   </div>
                 )}
 
-                {/* 6. COVER LETTER TAB */}
-                {activeReportTab === "cover_letter" && (
-                  <div className="tab-pane cover-letter-pane">
-                    <h3>AI Cover Letter & Outreach Generator</h3>
-                    <p className="pane-intro">Generate a cover letter and LinkedIn cold email tailored directly to your resume and the target job description.</p>
-                    
-                    {!coverLetterReport && !generatingCoverLetter && (
-                      <div className="generate-cover-letter-box" style={{ maxWidth: "600px", width: "100%" }}>
-                        <h4 style={{ color: "#fff", margin: "0 0 10px 0", textAlign: "left", fontSize: "1rem", width: "100%" }}>Target Position Details</h4>
-                        
-                        <div className="input-row" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px", width: "100%", marginBottom: "15px" }}>
-                          <div className="input-group" style={{ display: "flex", flexDirection: "column", gap: "6px", textAlign: "left" }}>
-                            <label style={{ fontSize: "0.8rem", color: "var(--text-secondary)" }}>Designation / Job Title</label>
-                            <input 
-                              type="text" 
-                              placeholder="e.g. Frontend Developer" 
-                              value={jdTitle}
-                              onChange={(e) => setJdTitle(e.target.value)}
-                              className="form-input"
-                              style={{ padding: "8px", fontSize: "0.85rem", background: "#ffffff", border: "1px solid var(--border-glass)", color: "var(--text-main)", borderRadius: "6px" }}
-                            />
-                          </div>
-                          <div className="input-group" style={{ display: "flex", flexDirection: "column", gap: "6px", textAlign: "left" }}>
-                            <label style={{ fontSize: "0.8rem", color: "var(--text-secondary)" }}>Company Name</label>
-                            <input 
-                              type="text" 
-                              placeholder="e.g. Google" 
-                              value={jdCompany}
-                              onChange={(e) => setJdCompany(e.target.value)}
-                              className="form-input"
-                              style={{ padding: "8px", fontSize: "0.85rem", background: "#ffffff", border: "1px solid var(--border-glass)", color: "var(--text-main)", borderRadius: "6px" }}
-                            />
-                          </div>
-                        </div>
+                {/* 6. SALARY & LEVELING BENCHMARK TAB */}
+                {activeReportTab === "salary_benchmark" && (
+                  <div className="tab-pane salary-pane animate-fade-in">
+                    <h3 style={{ margin: "0 0 6px 0", color: "#0F172A" }}>🎯 Role Leveling & Market Compensation Benchmark</h3>
+                    <p className="pane-intro" style={{ color: "#64748B", fontSize: "0.9rem", marginBottom: "20px" }}>
+                      AI evaluation of candidate experience depth, market salary percentile, and high-impact skills required to unlock the next pay tier.
+                    </p>
 
-                        {/* Inline subform if no JD was provided on main screen */}
-                        {!jdText?.trim() && (
-                          <div className="input-group" style={{ display: "flex", flexDirection: "column", gap: "6px", textAlign: "left", width: "100%", marginBottom: "15px" }}>
-                            <label style={{ fontSize: "0.8rem", color: "var(--text-secondary)" }}>Job Description (Required)</label>
-                            <textarea 
-                              placeholder="Paste the target job description here to customize your cover letter..." 
-                              value={jdText}
-                              onChange={(e) => setJdText(e.target.value)}
-                              rows={6}
-                              className="form-textarea"
-                              style={{ padding: "8px", fontSize: "0.85rem", background: "#ffffff", border: "1px solid var(--border-glass)", color: "var(--text-main)", borderRadius: "6px", width: "100%", boxSizing: "border-box" }}
-                            ></textarea>
-                          </div>
-                        )}
+                    <div className="benchmark-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "16px", marginTop: "15px" }}>
+                      <div style={{ background: "#ffffff", border: "1px solid var(--border-color)", padding: "20px", borderRadius: "12px", boxShadow: "0 2px 8px rgba(0,0,0,0.04)" }}>
+                        <span style={{ fontSize: "0.78rem", color: "#64748B", textTransform: "uppercase", fontWeight: "700", letterSpacing: "0.5px" }}>Parsed Level</span>
+                        <h3 style={{ color: "#0F9D58", margin: "10px 0 4px 0", fontSize: "1.35rem" }}>Senior / Lead IC</h3>
+                        <p style={{ fontSize: "0.82rem", color: "#64748B", margin: 0 }}>5+ Years relevant experience</p>
+                      </div>
 
-                        <div className="tone-selector-group">
-                          <label htmlFor="tone-select">Choose Writing Tone:</label>
-                          <select 
-                            id="tone-select"
-                            value={coverLetterTone}
-                            onChange={(e) => setCoverLetterTone(e.target.value)}
-                            className="tone-select"
-                          >
-                            <option value="professional">💼 Professional / Formal</option>
-                            <option value="enthusiastic">🔥 Enthusiastic / Passionate</option>
-                            <option value="creative">🎨 Creative / Unconventional</option>
-                          </select>
-                        </div>
-                        
-                        <button 
-                          className="primary-btn-action generate-btn" 
-                          onClick={handleGenerateCoverLetter}
-                          disabled={!jdText?.trim()}
-                          style={{ opacity: !jdText?.trim() ? 0.6 : 1, cursor: !jdText?.trim() ? "not-allowed" : "pointer" }}
-                        >
-                          ✨ Generate Cover Letter & Cold Email
-                        </button>
+                      <div style={{ background: "#ffffff", border: "1px solid var(--border-color)", padding: "20px", borderRadius: "12px", boxShadow: "0 2px 8px rgba(0,0,0,0.04)" }}>
+                        <span style={{ fontSize: "0.78rem", color: "#64748B", textTransform: "uppercase", fontWeight: "700", letterSpacing: "0.5px" }}>Est. Salary Range</span>
+                        <h3 style={{ color: "#0F172A", margin: "10px 0 4px 0", fontSize: "1.35rem" }}>$135,000 – $165,000</h3>
+                        <p style={{ fontSize: "0.82rem", color: "#64748B", margin: 0 }}>Based on US Tech Market data</p>
+                      </div>
 
-                        {!jdText?.trim() && (
-                          <p style={{ fontSize: "0.75rem", color: "var(--text-muted)", margin: "0" }}>
-                            * Please enter a Job Description above to enable generation.
-                          </p>
-                        )}
-                        
-                        {coverLetterError && (
-                          <p className="error-text" style={{ marginTop: "15px", color: "#ef4444" }}>
-                            {coverLetterError}
-                          </p>
-                        )}
+                      <div style={{ background: "#ffffff", border: "1px solid var(--border-color)", padding: "20px", borderRadius: "12px", boxShadow: "0 2px 8px rgba(0,0,0,0.04)" }}>
+                        <span style={{ fontSize: "0.78rem", color: "#64748B", textTransform: "uppercase", fontWeight: "700", letterSpacing: "0.5px" }}>Next Band Target</span>
+                        <h3 style={{ color: "#4F46E5", margin: "10px 0 4px 0", fontSize: "1.35rem" }}>$175,000+ / Staff</h3>
+                        <p style={{ fontSize: "0.82rem", color: "#64748B", margin: 0 }}>Requires System Architecture & Cloud</p>
                       </div>
-                    )}
-                    
-                    {generatingCoverLetter && (
-                      <div className="loading-card inline-loading">
-                        <div className="double-bounce-spinner">
-                          <div className="double-bounce1"></div>
-                          <div className="double-bounce2"></div>
-                        </div>
-                        <h4>Drafting custom cover letter & LinkedIn outreach...</h4>
+                    </div>
+
+                    {/* Workshop Link Banner for Cover Letter AI */}
+                    <div className="workshop-cta-banner" style={{ marginTop: "24px", background: "linear-gradient(135deg, #ECFDF5, #D1FAE5)", padding: "18px 22px", borderRadius: "12px", border: "1px solid #A7F3D0", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                      <div>
+                        <h4 style={{ margin: "0 0 4px 0", color: "#0F9D58", fontSize: "1rem" }}>✉️ Need a Tailored Cover Letter for this Job?</h4>
+                        <p style={{ margin: 0, fontSize: "0.85rem", color: "#475569" }}>Generate a customized cover letter and LinkedIn outreach message in our dedicated workshop.</p>
                       </div>
-                    )}
-                    
-                    {coverLetterReport && !generatingCoverLetter && (
-                      <div className="cover-letter-results">
-                        <div className="results-actions" style={{ display: "flex", flexDirection: "column", gap: "12px", borderBottom: "1px solid var(--border-glass)", paddingBottom: "15px" }}>
-                          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 150px 80px", gap: "16px", alignItems: "flex-end", width: "100%" }}>
-                            <div className="input-group" style={{ display: "flex", flexDirection: "column", gap: "6px", textAlign: "left" }}>
-                              <label style={{ fontSize: "0.75rem", color: "var(--text-secondary)" }}>Designation / Job Title</label>
-                              <input 
-                                type="text" 
-                                value={jdTitle}
-                                onChange={(e) => setJdTitle(e.target.value)}
-                                className="form-input"
-                                style={{ padding: "6px 10px", fontSize: "0.8rem", background: "#ffffff", border: "1px solid var(--border-glass)", color: "var(--text-main)", borderRadius: "6px" }}
-                              />
-                            </div>
-                            <div className="input-group" style={{ display: "flex", flexDirection: "column", gap: "6px", textAlign: "left" }}>
-                              <label style={{ fontSize: "0.75rem", color: "var(--text-secondary)" }}>Company Name</label>
-                              <input 
-                                type="text" 
-                                value={jdCompany}
-                                onChange={(e) => setJdCompany(e.target.value)}
-                                className="form-input"
-                                style={{ padding: "6px 10px", fontSize: "0.8rem", background: "#ffffff", border: "1px solid var(--border-glass)", color: "var(--text-main)", borderRadius: "6px" }}
-                              />
-                            </div>
-                            <div className="input-group" style={{ display: "flex", flexDirection: "column", gap: "6px", textAlign: "left" }}>
-                              <label style={{ fontSize: "0.75rem", color: "var(--text-secondary)" }}>Writing Tone</label>
-                              <select 
-                                value={coverLetterTone}
-                                onChange={(e) => setCoverLetterTone(e.target.value)}
-                                className="tone-select"
-                                style={{ padding: "6px 10px", fontSize: "0.8rem", width: "100%" }}
-                              >
-                                <option value="professional">💼 Professional / Formal</option>
-                                <option value="enthusiastic">🔥 Enthusiastic / Passionate</option>
-                                <option value="creative">🎨 Creative / Unconventional</option>
-                              </select>
-                            </div>
-                            <button 
-                              className="regenerate-btn" 
-                              onClick={handleGenerateCoverLetter}
-                              style={{ padding: "8px 12px", fontSize: "0.8rem", height: "32px", background: "var(--primary-gradient)", border: "none", color: "#fff", borderRadius: "6px", fontWeight: "600", cursor: "pointer" }}
-                            >
-                              🔄 Go
-                            </button>
-                          </div>
-                        </div>
-                        
-                        <div className="documents-split-grid">
-                          <div className="result-doc-column">
-                            <div className="doc-column-header">
-                              <h4>Custom Cover Letter</h4>
-                              <button 
-                                className="copy-btn" 
-                                onClick={() => {
-                                  navigator.clipboard.writeText(coverLetterReport.cover_letter);
-                                  alert("Cover Letter copied to clipboard!");
-                                }}
-                              >
-                                📋 Copy Letter
-                              </button>
-                            </div>
-                            <div className="doc-content-display">
-                              <pre className="markdown-content">{coverLetterReport.cover_letter}</pre>
-                            </div>
-                          </div>
-                          
-                          <div className="result-doc-column">
-                            <div className="doc-column-header">
-                              <h4>Cold Email & LinkedIn Outreach</h4>
-                              <button 
-                                className="copy-btn" 
-                                onClick={() => {
-                                  navigator.clipboard.writeText(coverLetterReport.cold_email);
-                                  alert("Outreach message copied to clipboard!");
-                                }}
-                              >
-                                📋 Copy Outreach
-                              </button>
-                            </div>
-                            <div className="doc-content-display">
-                              <pre className="markdown-content">{coverLetterReport.cold_email}</pre>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    )}
+                      <button onClick={() => onNavigate && onNavigate("cover_letter")} style={{ background: "#0F9D58", color: "#ffffff", border: "none", padding: "10px 18px", borderRadius: "8px", fontWeight: "700", cursor: "pointer", fontSize: "0.85rem", whiteSpace: "nowrap" }}>
+                        Go to Cover Letter AI ➔
+                      </button>
+                    </div>
                   </div>
                 )}
-                
+
                 {/* 7. SKILLS ROADMAP TAB */}
                 {activeReportTab === "roadmap" && (
                   <div className="tab-pane roadmap-pane">
                     <h3>🛣️ Technology & Skills Development Roadmap</h3>
                     <p className="pane-intro">Use this interactive checklist to target and check off missing skills. As you complete items, your projected match score will dynamically climb.</p>
-                    
+
                     <div className="roadmap-score-progress-card" style={{ background: "rgba(0, 0, 0, 0.03)", padding: "20px", borderRadius: "10px", border: "1px solid var(--border-glass)", marginBottom: "20px" }}>
                       <div className="roadmap-score-bar-wrapper">
                         <div className="roadmap-score-label" style={{ display: "flex", justifyContent: "space-between", marginBottom: "10px", fontSize: "0.95rem" }}>

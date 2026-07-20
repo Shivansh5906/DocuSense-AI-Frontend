@@ -549,8 +549,8 @@
   align-items: center;
   justify-content: space-between;
   padding: 12px 32px;
-  background: #111827 !important; /* Dark Charcoal background */
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
+  background: #0B1220 !important; /* Top navigation background #0B1220 */
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
   color: #ffffff !important;
 }
 
@@ -565,7 +565,7 @@
 .navbar-logo .logo-icon-small {
   width: 28px;
   height: 28px;
-  background: #059669 !important; /* Emerald green branding background */
+  background: #0F9D58 !important; /* Emerald green branding background */
   color: #ffffff !important;
   border-radius: 6px;
   display: flex;
@@ -582,7 +582,7 @@
 }
 
 .navbar-logo .logo-light {
-  color: #10b981 !important; /* Light Emerald accent logo text */
+  color: #0F9D58 !important; /* Emerald green logo text */
   font-weight: 400;
   font-size: 1.25rem;
 }
@@ -594,21 +594,22 @@
   font-weight: 500;
   font-size: 0.9rem;
   cursor: pointer;
-  padding: 8px 12px;
+  padding: 8px 14px;
   transition: all 0.2s ease;
   font-family: inherit;
-  border-radius: 4px;
+  border-radius: 6px;
 }
 
 .navbar-nav-links .nav-link-btn:hover {
   color: #ffffff !important;
-  background: rgba(255, 255, 255, 0.06);
+  background: rgba(255, 255, 255, 0.08);
 }
 
 .navbar-nav-links .nav-link-btn.active {
-  color: #fbbf24 !important; /* High-contrast yellow accent for active route */
-  font-weight: 600;
-  background: rgba(251, 191, 36, 0.08);
+  color: #0F9D58 !important; /* Emerald green active tab */
+  font-weight: 700;
+  background: rgba(15, 157, 88, 0.12);
+  border: 1px solid rgba(15, 157, 88, 0.3);
 }
 
 .nav-login-btn {
@@ -1105,8 +1106,10 @@
 .resume-builder-container {
   display: flex;
   flex-direction: column;
-  height: 100%;
+  height: calc(100vh - 110px);
   gap: 16px;
+  overflow: hidden;
+  box-sizing: border-box;
 }
 
 .builder-top-bar {
@@ -1173,19 +1176,29 @@
   gap: 10px;
 }
 
-/* Workspace layout splits */
+/* Workspace layout splits - Perfect 50/50 Screen Split */
 .builder-workspace-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 20px;
+  width: 100%;
   flex: 1;
-  min-height: 0; /* Important for flex child scrolling! */
+  height: 100%;
+  min-height: 0; /* Prevents grid blowout */
+  overflow: hidden;
+  box-sizing: border-box;
 }
 
 .builder-form-panel {
   display: flex;
   flex-direction: column;
+  height: 100%;
   min-height: 0;
+  width: 100%;
+  overflow: hidden;
+  background: #ffffff;
+  border-radius: 12px;
+  border: 1px solid var(--border-glass);
 }
 
 .form-tabs-headers {
@@ -1219,135 +1232,62 @@
   overflow-y: auto;
 }
 
-.form-section-fields h3 {
-  margin: 0 0 4px 0;
-  color: #fff;
-  font-size: 1.15rem;
-}
-
-.field-guideline {
-  font-size: 0.78rem;
-  color: var(--text-secondary);
-  margin-top: 0;
-  margin-bottom: 18px;
-}
-
-.field-grid-2 {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 16px;
-}
-
-.field-grid-3 {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 12px;
-}
-
-.form-group {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  margin-bottom: 16px;
-  text-align: left;
-}
-
-.form-group label {
-  font-size: 0.8rem;
-  color: var(--text-secondary);
-  font-weight: 600;
-}
-
-.form-group input, .form-group textarea, .form-select {
-  background: #ffffff;
-  border: 1px solid var(--border-glass);
-  color: var(--text-main);
-  border-radius: 6px;
-  padding: 10px;
-  font-size: 0.88rem;
-  font-family: inherit;
-  transition: var(--transition-smooth);
-  box-sizing: border-box;
-}
-
-.form-group input:focus, .form-group textarea:focus, .form-select:focus {
-  border-color: #6366f1;
-  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
-  outline: none;
-}
-
-.builder-textarea-large {
-  width: 100%;
-}
-
-.section-title-action {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 15px;
-}
-
-.add-btn-pill {
-  background: rgba(245, 158, 11, 0.15);
-  border: 1px solid rgba(245, 158, 11, 0.3);
-  color: #f59e0b;
-  padding: 6px 12px;
-  font-size: 0.78rem;
-  font-weight: 700;
-  border-radius: 30px;
-  cursor: pointer;
-  transition: var(--transition-smooth);
-}
-
-.add-btn-pill:hover {
-  background: #f59e0b;
-  color: #030712;
-  border-color: transparent;
-}
-
 .no-items-placeholder {
   font-size: 0.85rem;
-  color: var(--text-muted);
+  color: #D97706;
+  background: #FEF3C7;
   text-align: center;
-  padding: 30px;
-  border: 1px dashed var(--border-glass);
+  padding: 20px;
+  border: 1px dashed rgba(217, 119, 6, 0.3);
   border-radius: 8px;
+  font-weight: 500;
+  margin: 10px 0;
 }
 
-.items-accordion-list {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-}
-
-.nested-item-card {
-  background: rgba(255, 255, 255, 0.02);
-  border: 1px solid var(--border-glass);
-  border-radius: 8px;
-  padding: 16px;
-  position: relative;
-}
-
-.item-card-header {
+.field-label-row {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-  padding-bottom: 10px;
-  margin-bottom: 14px;
 }
 
-.item-card-header h4 {
-  margin: 0;
-  font-size: 0.9rem;
-  color: #cbd5e1;
-}
-
-.delete-icon-btn {
+.inline-clear-link {
   background: transparent;
   border: none;
+  font-size: 0.85rem;
   cursor: pointer;
-  font-size: 0.9rem;
+  padding: 2px 4px;
+  border-radius: 4px;
+  opacity: 0.7;
+  transition: var(--transition-smooth);
+}
+
+.inline-clear-link:hover {
+  opacity: 1;
+  background: rgba(239, 68, 68, 0.15);
+  transform: scale(1.1);
+}
+
+.title-action-btns {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.clear-btn-pill {
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.25);
+  color: #ef4444;
+  padding: 5px 12px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  border-radius: 20px;
+  cursor: pointer;
+  transition: var(--transition-smooth);
+}
+
+.clear-btn-pill:hover {
+  background: rgba(239, 68, 68, 0.2);
+  color: #dc2626;
 }
 
 /* ==========================================
@@ -1356,21 +1296,25 @@
 .builder-preview-panel {
   display: flex;
   flex-direction: column;
+  align-items: center;
+  height: 100%;
   min-height: 0;
-  background: #f1f5f9;
+  background: #cbd5e1;
   border-radius: 12px;
-  padding: 16px;
+  padding: 20px;
   overflow-y: auto;
   border: 1px solid var(--border-glass);
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .preview-instructions {
-  font-size: 0.8rem;
-  color: var(--text-secondary);
+  font-size: 0.82rem;
+  color: #334155;
   text-align: center;
-  margin-bottom: 12px;
-  font-weight: 500;
-  opacity: 0.8;
+  margin-bottom: 14px;
+  font-weight: 700;
+  flex-shrink: 0;
 }
 
 /* Simulated A4 document page wrapper */
@@ -1378,15 +1322,16 @@
   background: #ffffff;
   color: #111827;
   width: 100%;
-  max-width: 680px; /* Scaled fit preview */
-  min-height: 870px;
+  max-width: 640px; /* Clean proportional A4 sheet fit */
+  min-height: 840px;
   margin: 0 auto;
-  padding: 40px;
-  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
+  padding: 36px 40px;
+  box-shadow: 0 12px 30px rgba(15, 23, 42, 0.15), 0 2px 6px rgba(15, 23, 42, 0.05);
   box-sizing: border-box;
   text-align: left;
-  line-height: 1.4;
-  font-size: 13px;
+  line-height: 1.45;
+  font-size: 12.5px;
+  flex-shrink: 0;
 }
 
 /* Typography styles for printable templates */

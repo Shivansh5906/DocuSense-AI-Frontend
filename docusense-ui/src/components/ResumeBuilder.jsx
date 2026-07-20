@@ -143,6 +143,9 @@ export default function ResumeBuilder({ selectedFilename, onSaveSuccess, initial
   const [experience, setExperience] = useState([]);
   const [education, setEducation] = useState([]);
   const [projects, setProjects] = useState([]);
+  const [certifications, setCertifications] = useState([
+    { name: "AWS Certified Solutions Architect", issuer: "Amazon Web Services", year: "2023" }
+  ]);
   const [skills, setSkills] = useState({
     technical: "",
     soft: "",
@@ -206,6 +209,18 @@ export default function ResumeBuilder({ selectedFilename, onSaveSuccess, initial
   };
   const deleteProject = (idx) => {
     setProjects(projects.filter((_, i) => i !== idx));
+  };
+
+  const addCertification = () => {
+    setCertifications([...certifications, { name: "", issuer: "", year: "" }]);
+  };
+  const updateCertification = (idx, field, value) => {
+    const updated = [...certifications];
+    updated[idx][field] = value;
+    setCertifications(updated);
+  };
+  const deleteCertification = (idx) => {
+    setCertifications(certifications.filter((_, i) => i !== idx));
   };
 
   // Compile Resume details into a structured Markdown format for AI matching
@@ -320,45 +335,76 @@ export default function ResumeBuilder({ selectedFilename, onSaveSuccess, initial
             <button className={`form-tab-link ${activeFormTab === "education" ? "active" : ""}`} onClick={() => setActiveFormTab("education")}>Education ({education.length})</button>
             <button className={`form-tab-link ${activeFormTab === "projects" ? "active" : ""}`} onClick={() => setActiveFormTab("projects")}>Projects ({projects.length})</button>
             <button className={`form-tab-link ${activeFormTab === "skills" ? "active" : ""}`} onClick={() => setActiveFormTab("skills")}>Skills</button>
+            <button className={`form-tab-link ${activeFormTab === "certifications" ? "active" : ""}`} onClick={() => setActiveFormTab("certifications")}>Certifications ({certifications.length})</button>
           </div>
 
           <div className="form-tab-body">
             {/* PERSONAL INFO */}
             {activeFormTab === "personal" && (
               <div className="form-section-fields animate-fade-in">
-                <h3>Contact & Header Details</h3>
+                <div className="section-title-action">
+                  <h3>Contact & Header Details</h3>
+                  <button className="clear-btn-pill" onClick={() => setPersonal({ fullName: "", jobTitle: "", email: "", phone: "", location: "", linkedin: "", website: "" })}>
+                    🗑️ Clear Contact Details
+                  </button>
+                </div>
+
                 <div className="field-grid-2">
                   <div className="form-group">
-                    <label>Full Name</label>
+                    <div className="field-label-row">
+                      <label>Full Name</label>
+                      {personal.fullName && <button className="inline-clear-link" onClick={() => setPersonal({...personal, fullName: ""})} title="Clear field">🗑️</button>}
+                    </div>
                     <input type="text" value={personal.fullName} onChange={(e) => setPersonal({...personal, fullName: e.target.value})} placeholder="e.g. Sarah Johnson" />
                   </div>
                   <div className="form-group">
-                    <label>Target Professional Title</label>
+                    <div className="field-label-row">
+                      <label>Target Professional Title</label>
+                      {personal.jobTitle && <button className="inline-clear-link" onClick={() => setPersonal({...personal, jobTitle: ""})} title="Clear field">🗑️</button>}
+                    </div>
                     <input type="text" value={personal.jobTitle} onChange={(e) => setPersonal({...personal, jobTitle: e.target.value})} placeholder="e.g. Senior Product Marketer" />
                   </div>
                 </div>
+
                 <div className="field-grid-2">
                   <div className="form-group">
-                    <label>Email Address</label>
+                    <div className="field-label-row">
+                      <label>Email Address</label>
+                      {personal.email && <button className="inline-clear-link" onClick={() => setPersonal({...personal, email: ""})} title="Clear field">🗑️</button>}
+                    </div>
                     <input type="email" value={personal.email} onChange={(e) => setPersonal({...personal, email: e.target.value})} placeholder="sarah@example.com" />
                   </div>
                   <div className="form-group">
-                    <label>Phone Number</label>
+                    <div className="field-label-row">
+                      <label>Phone Number</label>
+                      {personal.phone && <button className="inline-clear-link" onClick={() => setPersonal({...personal, phone: ""})} title="Clear field">🗑️</button>}
+                    </div>
                     <input type="text" value={personal.phone} onChange={(e) => setPersonal({...personal, phone: e.target.value})} placeholder="+1 (555) 000-0000" />
                   </div>
                 </div>
+
                 <div className="field-grid-2">
                   <div className="form-group">
-                    <label>Location (City, State)</label>
+                    <div className="field-label-row">
+                      <label>Location (City, State)</label>
+                      {personal.location && <button className="inline-clear-link" onClick={() => setPersonal({...personal, location: ""})} title="Clear field">🗑️</button>}
+                    </div>
                     <input type="text" value={personal.location} onChange={(e) => setPersonal({...personal, location: e.target.value})} placeholder="San Francisco, CA" />
                   </div>
                   <div className="form-group">
-                    <label>LinkedIn URL</label>
+                    <div className="field-label-row">
+                      <label>LinkedIn URL</label>
+                      {personal.linkedin && <button className="inline-clear-link" onClick={() => setPersonal({...personal, linkedin: ""})} title="Clear field">🗑️</button>}
+                    </div>
                     <input type="text" value={personal.linkedin} onChange={(e) => setPersonal({...personal, linkedin: e.target.value})} placeholder="linkedin.com/in/username" />
                   </div>
                 </div>
+
                 <div className="form-group">
-                  <label>Portfolio / Website</label>
+                  <div className="field-label-row">
+                    <label>Portfolio / Website</label>
+                    {personal.website && <button className="inline-clear-link" onClick={() => setPersonal({...personal, website: ""})} title="Clear field">🗑️</button>}
+                  </div>
                   <input type="text" value={personal.website} onChange={(e) => setPersonal({...personal, website: e.target.value})} placeholder="myportfolio.dev" />
                 </div>
               </div>
@@ -367,7 +413,10 @@ export default function ResumeBuilder({ selectedFilename, onSaveSuccess, initial
             {/* SUMMARY */}
             {activeFormTab === "summary" && (
               <div className="form-section-fields animate-fade-in">
-                <h3>Professional Summary</h3>
+                <div className="section-title-action">
+                  <h3>Professional Summary</h3>
+                  {summary && <button className="clear-btn-pill" onClick={() => setSummary("")}>🗑️ Clear Summary</button>}
+                </div>
                 <p className="field-guideline">Provide a brief, compelling introduction highlighting your main values, top expertise, and major career goals (typically 3-4 sentences).</p>
                 <div className="form-group">
                   <textarea rows={8} value={summary} onChange={(e) => setSummary(e.target.value)} placeholder="A results-oriented career specialist with expertise in..." className="builder-textarea-large"></textarea>
@@ -379,8 +428,11 @@ export default function ResumeBuilder({ selectedFilename, onSaveSuccess, initial
             {activeFormTab === "experience" && (
               <div className="form-section-fields animate-fade-in">
                 <div className="section-title-action">
-                  <h3>Work Experience</h3>
-                  <button className="add-btn-pill" onClick={addExperience}>+ Add Job</button>
+                  <h3>Work Experience ({experience.length})</h3>
+                  <div className="title-action-btns">
+                    {experience.length > 0 && <button className="clear-btn-pill" onClick={() => setExperience([])}>🗑️ Remove All Jobs</button>}
+                    <button className="add-btn-pill" onClick={addExperience}>+ Add Job</button>
+                  </div>
                 </div>
 
                 {experience.length === 0 ? (
@@ -432,8 +484,11 @@ export default function ResumeBuilder({ selectedFilename, onSaveSuccess, initial
             {activeFormTab === "education" && (
               <div className="form-section-fields animate-fade-in">
                 <div className="section-title-action">
-                  <h3>Education Credentials</h3>
-                  <button className="add-btn-pill" onClick={addEducation}>+ Add Education</button>
+                  <h3>Education Credentials ({education.length})</h3>
+                  <div className="title-action-btns">
+                    {education.length > 0 && <button className="clear-btn-pill" onClick={() => setEducation([])}>🗑️ Remove All Education</button>}
+                    <button className="add-btn-pill" onClick={addEducation}>+ Add Education</button>
+                  </div>
                 </div>
 
                 {education.length === 0 ? (
@@ -444,7 +499,7 @@ export default function ResumeBuilder({ selectedFilename, onSaveSuccess, initial
                       <div key={idx} className="nested-item-card">
                         <div className="item-card-header">
                           <h4>Academic #{idx + 1}: {edu.degree || "Degree"}</h4>
-                          <button className="delete-icon-btn" onClick={() => deleteEducation(idx)}>🗑️</button>
+                          <button className="delete-icon-btn" onClick={() => deleteEducation(idx)} title="Delete item">🗑️ Delete</button>
                         </div>
                         <div className="field-grid-2">
                           <div className="form-group">
@@ -485,8 +540,11 @@ export default function ResumeBuilder({ selectedFilename, onSaveSuccess, initial
             {activeFormTab === "projects" && (
               <div className="form-section-fields animate-fade-in">
                 <div className="section-title-action">
-                  <h3>Key Projects</h3>
-                  <button className="add-btn-pill" onClick={addProject}>+ Add Project</button>
+                  <h3>Key Projects ({projects.length})</h3>
+                  <div className="title-action-btns">
+                    {projects.length > 0 && <button className="clear-btn-pill" onClick={() => setProjects([])}>🗑️ Remove All Projects</button>}
+                    <button className="add-btn-pill" onClick={addProject}>+ Add Project</button>
+                  </div>
                 </div>
 
                 {projects.length === 0 ? (
@@ -497,7 +555,7 @@ export default function ResumeBuilder({ selectedFilename, onSaveSuccess, initial
                       <div key={idx} className="nested-item-card">
                         <div className="item-card-header">
                           <h4>Project #{idx + 1}: {proj.name || "Project Name"}</h4>
-                          <button className="delete-icon-btn" onClick={() => deleteProject(idx)}>🗑️</button>
+                          <button className="delete-icon-btn" onClick={() => deleteProject(idx)} title="Delete item">🗑️ Delete</button>
                         </div>
                         <div className="field-grid-2">
                           <div className="form-group">
@@ -527,20 +585,78 @@ export default function ResumeBuilder({ selectedFilename, onSaveSuccess, initial
             {/* SKILLS */}
             {activeFormTab === "skills" && (
               <div className="form-section-fields animate-fade-in">
-                <h3>Skills Categorization</h3>
+                <div className="section-title-action">
+                  <h3>Skills Categorization</h3>
+                  {(skills.technical || skills.soft || skills.tools) && (
+                    <button className="clear-btn-pill" onClick={() => setSkills({ technical: "", soft: "", tools: "" })}>
+                      🗑️ Clear All Skills
+                    </button>
+                  )}
+                </div>
                 <p className="field-guideline">List keywords separated by commas. These will feed the ATS scoring parameters and keyword matchers.</p>
                 <div className="form-group">
-                  <label>Technical Skills (Languages, Frameworks, Tech Stacks)</label>
+                  <div className="field-label-row">
+                    <label>Technical Skills (Languages, Frameworks, Tech Stacks)</label>
+                    {skills.technical && <button className="inline-clear-link" onClick={() => setSkills({...skills, technical: ""})} title="Clear field">🗑️</button>}
+                  </div>
                   <textarea rows={3} value={skills.technical} onChange={(e) => setSkills({...skills, technical: e.target.value})} placeholder="e.g. JavaScript, Python, React, AWS, Docker"></textarea>
                 </div>
                 <div className="form-group">
-                  <label>Soft Skills (Interpersonal, Processes)</label>
+                  <div className="field-label-row">
+                    <label>Soft Skills (Interpersonal, Processes)</label>
+                    {skills.soft && <button className="inline-clear-link" onClick={() => setSkills({...skills, soft: ""})} title="Clear field">🗑️</button>}
+                  </div>
                   <textarea rows={3} value={skills.soft} onChange={(e) => setSkills({...skills, soft: e.target.value})} placeholder="e.g. Project Leadership, Mentoring, Agile Methodology"></textarea>
                 </div>
                 <div className="form-group">
-                  <label>Tools & Software (Applications, Services)</label>
+                  <div className="field-label-row">
+                    <label>Tools & Software (Applications, Services)</label>
+                    {skills.tools && <button className="inline-clear-link" onClick={() => setSkills({...skills, tools: ""})} title="Clear field">🗑️</button>}
+                  </div>
                   <textarea rows={3} value={skills.tools} onChange={(e) => setSkills({...skills, tools: e.target.value})} placeholder="e.g. Git, Figma, JIRA, VS Code, Amplitude"></textarea>
                 </div>
+              </div>
+            )}
+
+            {/* CERTIFICATIONS */}
+            {activeFormTab === "certifications" && (
+              <div className="form-section-fields animate-fade-in">
+                <div className="section-title-action">
+                  <h3>Certifications & Training ({certifications.length})</h3>
+                  <div className="title-action-btns">
+                    {certifications.length > 0 && <button className="clear-btn-pill" onClick={() => setCertifications([])}>🗑️ Remove All Certifications</button>}
+                    <button className="add-btn-pill" onClick={addCertification}>+ Add Certification</button>
+                  </div>
+                </div>
+
+                {certifications.length === 0 ? (
+                  <p className="no-items-placeholder">No certifications added. Click 'Add Certification' to start.</p>
+                ) : (
+                  <div className="items-accordion-list">
+                    {certifications.map((cert, idx) => (
+                      <div key={idx} className="nested-item-card">
+                        <div className="item-card-header">
+                          <h4>Certification #{idx + 1}: {cert.name || "Certification Title"}</h4>
+                          <button className="delete-icon-btn" onClick={() => deleteCertification(idx)}>🗑️</button>
+                        </div>
+                        <div className="field-grid-3">
+                          <div className="form-group">
+                            <label>Certification Name</label>
+                            <input type="text" value={cert.name} onChange={(e) => updateCertification(idx, "name", e.target.value)} placeholder="e.g. AWS Certified Developer" />
+                          </div>
+                          <div className="form-group">
+                            <label>Issuing Organization</label>
+                            <input type="text" value={cert.issuer} onChange={(e) => updateCertification(idx, "issuer", e.target.value)} placeholder="e.g. Amazon Web Services" />
+                          </div>
+                          <div className="form-group">
+                            <label>Year Acquired</label>
+                            <input type="text" value={cert.year} onChange={(e) => updateCertification(idx, "year", e.target.value)} placeholder="2023" />
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
             )}
           </div>
@@ -649,6 +765,23 @@ export default function ResumeBuilder({ selectedFilename, onSaveSuccess, initial
                           <strong>Tools & Environments:</strong> {skills.tools}
                         </div>
                       )}
+                    </div>
+                  </section>
+                )}
+
+                {certifications.length > 0 && (
+                  <section className="modern-section">
+                    <h3>Certifications & Credentials</h3>
+                    <div className="timeline-list">
+                      {certifications.map((c, i) => (
+                        <div key={i} className="timeline-item">
+                          <div className="timeline-meta">
+                            <span className="job-title">{c.name || "Certification Name"}</span>
+                            <span className="job-date">{c.year}</span>
+                          </div>
+                          <div className="company-info">{c.issuer || "Issuing Body"}</div>
+                        </div>
+                      ))}
                     </div>
                   </section>
                 )}

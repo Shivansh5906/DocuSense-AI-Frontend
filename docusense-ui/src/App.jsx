@@ -6,6 +6,8 @@ import ResumeAnalyzer from "./components/ResumeAnalyzer";
 import LandingDashboard from "./components/LandingDashboard";
 import ResumeBuilder from "./components/ResumeBuilder";
 import LinkedInOptimizer from "./components/LinkedInOptimizer";
+import CoverLetterGenerator from "./components/CoverLetterGenerator";
+import InterviewPrep from "./components/InterviewPrep";
 import CareerBlog from "./components/CareerBlog";
 import "./App.css";
 
@@ -21,7 +23,7 @@ export default function App() {
   const [invalidFile, setInvalidFile] = useState(null);
   const [activeView, setActiveView] = useState("landing"); // "landing", "builder", "matcher", "cover_letter", "review", "linkedin", "templates", "examples", "pricing", "blog"
   const [selectedTemplate, setSelectedTemplate] = useState("modern");
-  const showSidebarLayout = !["landing", "pricing", "blog", "templates", "examples", "builder_select_template"].includes(activeView);
+  const showSidebarLayout = !["landing", "pricing", "blog", "templates", "examples", "builder_select_template", "builder"].includes(activeView);
 
   // Monitor for document validation failure to prompt user
   useEffect(() => {
@@ -61,6 +63,21 @@ export default function App() {
     setSelectedFilename(fname);
   };
 
+  const handleGlobalUpload = async (e) => {
+    if (e.target.files && e.target.files[0]) {
+      const file = e.target.files[0];
+      const formData = new FormData();
+      formData.append("file", file);
+      try {
+        await api.post("/documents/upload", formData);
+        handleUploadDone(file.name);
+      } catch (err) {
+        console.error("Global upload failed", err);
+        alert("Upload failed. Please make sure the file is a valid PDF or DOCX.");
+      }
+    }
+  };
+
   const handleDelete = async (filename) => {
     try {
       await api.delete(`/documents/${encodeURIComponent(filename)}`);
@@ -96,9 +113,10 @@ export default function App() {
         <nav className="navbar-nav-links">
           <button className={`nav-link-btn ${activeView === "landing" ? "active" : ""}`} onClick={() => setActiveView("landing")}>Home</button>
           <button className={`nav-link-btn ${["builder", "builder_select_template"].includes(activeView) ? "active" : ""}`} onClick={() => setActiveView("builder_select_template")}>Resume Builder</button>
-          <button className={`nav-link-btn ${activeView === "review" ? "active" : ""}`} onClick={() => setActiveView("review")}>ATS Checker</button>
-          <button className={`nav-link-btn ${activeView === "cover_letter" ? "active" : ""}`} onClick={() => setActiveView("cover_letter")}>Cover Letter</button>
-          <button className={`nav-link-btn ${activeView === "matcher" ? "active" : ""}`} onClick={() => setActiveView("matcher")}>Job Match</button>
+          <button className={`nav-link-btn ${activeView === "review" ? "active" : ""}`} onClick={() => setActiveView("review")}>ATS & Matcher</button>
+          <button className={`nav-link-btn ${activeView === "cover_letter" ? "active" : ""}`} onClick={() => setActiveView("cover_letter")}>Cover Letter AI</button>
+          <button className={`nav-link-btn ${activeView === "linkedin" ? "active" : ""}`} onClick={() => setActiveView("linkedin")}>LinkedIn AI</button>
+          <button className={`nav-link-btn ${activeView === "interview_prep" ? "active" : ""}`} onClick={() => setActiveView("interview_prep")}>Interview & Tools</button>
         </nav>
 
         <div className="navbar-right-controls">
@@ -179,7 +197,8 @@ export default function App() {
                 {activeView === "builder_select_template" && "Select Resume Template"}
                 {activeView === "builder" && "Interactive Resume Creator"}
                 {activeView === "matcher" && "Resume Job Matcher"}
-                {activeView === "cover_letter" && "Cover Letter Generator"}
+                {activeView === "cover_letter" && "AI Cover Letter Workshop"}
+                {activeView === "interview_prep" && "Interview Prep & Keyword Finder"}
                 {activeView === "review" && "Resume & CV ATS Audit"}
                 {activeView === "linkedin" && "LinkedIn Profile Optimizer"}
                 {activeView === "blog" && "Career Guides Library"}
@@ -209,18 +228,17 @@ export default function App() {
                 selectedFilename={selectedFilename}
                 setSelectedFilename={setSelectedFilename}
                 onUploadDone={handleUploadDone}
+                onNavigate={setActiveView}
                 forceTab="jd_match"
               />
             )}
 
             {activeView === "cover_letter" && (
-              <ResumeAnalyzer
-                documents={documents}
-                selectedFilename={selectedFilename}
-                setSelectedFilename={setSelectedFilename}
-                onUploadDone={handleUploadDone}
-                forceTab="cover_letter"
-              />
+              <CoverLetterGenerator />
+            )}
+
+            {activeView === "interview_prep" && (
+              <InterviewPrep />
             )}
 
             {activeView === "review" && (
@@ -321,7 +339,7 @@ export default function App() {
                 const fname = invalidFile.filename;
                 setInvalidFile(null);
                 await handleDelete(fname);
-                const fileInput = document.querySelector("input[type='file']");
+                const fileInput = document.getElementById("app-global-file-input");
                 if (fileInput) {
                   fileInput.click();
                 }
@@ -332,6 +350,13 @@ export default function App() {
           </div>
         </div>
       )}
+      <input
+        type="file"
+        id="app-global-file-input"
+        accept=".pdf,.docx"
+        style={{ display: "none" }}
+        onChange={handleGlobalUpload}
+      />
     </div>
   );
 }

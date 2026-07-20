@@ -1,37 +1,33 @@
 @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap');
 
 :root {
-  --bg-primary: #F1F5F9; /* Light Gray main background */
-  --bg-secondary: #F8FAFC; /* Soft Gray side panels/information panels */
-  --bg-card: #FFFFFF; /* White cards and forms */
-  --bg-upload: #ECFDF5; /* Light Mint upload area background */
-  --bg-glass: rgba(255, 255, 255, 0.7);
-  --border-glass: rgba(15, 23, 42, 0.08);
-  --border-glass-active: rgba(5, 150, 105, 0.35); /* Active Emerald border */
-  
-  --primary: #059669; /* Emerald Green */
-  --primary-hover: #047857; /* Dark Emerald */
-  --primary-gradient: linear-gradient(135deg, #059669, #10B981);
-  --secondary-gradient: linear-gradient(135deg, #10B981, #34D399);
-  
-  --success: #10B981; /* Green */
-  --warning: #F59E0B; /* Amber */
-  --danger: #EF4444; /* Red */
-  --info: #0EA5E9; /* Sky Blue */
-  
-  --text-main: #111827; /* Almost Black headings */
-  --text-secondary: #334155; /* Dark Slate subtitles */
-  --text-body: #475569; /* Slate Gray paragraphs/body text */
-  --text-muted: #94A3B8; /* Cool Gray placeholders/muted text */
-  
-  --border-color: #CBD5E1; /* Light Gray borders/dividers */
-  --border-focus: #059669; /* Emerald focused border */
-  
-  --card-shadow: 0 4px 20px rgba(15, 23, 42, 0.08);
-  --modal-overlay: rgba(17, 24, 39, 0.5);
-  
-  --shadow-glow: 0 8px 30px rgba(5, 150, 105, 0.06);
-  --transition-smooth: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+  /* Core palette */
+  --primary: #0F9D58;           /* Emerald green */
+  --primary-hover: #0B7A44;     /* Emerald green hover */
+  --primary-gradient: linear-gradient(135deg, #0F9D58, #0B7A44);
+
+  --ai-accent: #4F46E5;         /* Indigo AI accent */
+  --ai-accent-bg: #EEF2FF;      /* Light Indigo BG */
+
+  --warning: #D97706;           /* Amber warning */
+  --warning-bg: #FEF3C7;        /* Light Amber BG */
+
+  --text-main: #0F172A;         /* Slate dark text */
+  --text-secondary: #64748B;    /* Slate secondary text */
+  --border-color: #E2E8F0;      /* Slate border */
+  --border-glass: #E2E8F0;
+  --border-focus: #0F9D58;
+
+  /* Backgrounds */
+  --bg-primary: #F8FAFC;        /* Page background body */
+  --bg-secondary: #F8FAFC;
+  --bg-card: #FFFFFF;           /* Card / panel */
+  --bg-nav: #0B1220;            /* Top navbar background */
+  --bg-upload: #ECFDF5;         /* Upload/dropzone background */
+  --border-upload: #0F9D58;     /* Upload/dropzone dashed border */
+
+  --shadow-glow: 0 8px 30px rgba(15, 157, 88, 0.12);
+  --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 body {
@@ -255,10 +251,14 @@ body {
 
 
 .no-docs {
-  color: var(--text-muted);
+  color: #D97706;
+  background: #FEF3C7;
   font-size: 0.85rem;
+  font-weight: 500;
   text-align: center;
-  padding: 20px 0;
+  padding: 12px 14px;
+  border-radius: 8px;
+  border: 1px solid rgba(217, 119, 6, 0.2);
 }
 
 /* Upload Card Widget in Sidebar */
