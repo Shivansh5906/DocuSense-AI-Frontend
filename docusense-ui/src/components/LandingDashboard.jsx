@@ -158,27 +158,27 @@ export default function LandingDashboard({ onViewChange }) {
       {/* 1. Hero Section */}
       <section className="hero-section">
         <div className="hero-content">
-          <div className="hero-badge-container" style={{ marginBottom: "16px" }}>
-            <span className="hero-badge" style={{ background: "rgba(79, 70, 229, 0.08)", border: "1px solid rgba(79, 70, 229, 0.2)", padding: "6px 12px", borderRadius: "99px", fontSize: "0.85rem", fontWeight: "600", color: "var(--primary)" }}>
+          <div className="hero-badge-container">
+            <span className="hero-badge">
               🚀 AI Powered • ATS Optimized • Recruiter Friendly
             </span>
           </div>
           
-          <h1 className="hero-title" style={{ fontSize: "3.2rem", fontWeight: "800", color: "#0f172a", lineHeight: "1.15", letterSpacing: "-1.5px", margin: "0 0 16px 0" }}>
+          <h1 className="hero-title">
             Build a Resume <br />
             That Gets You Hired
           </h1>
           
-          <p className="hero-desc" style={{ fontSize: "1.15rem", color: "#475569", lineHeight: "1.55", marginBottom: "28px", maxWidth: "580px" }}>
+          <p className="hero-desc">
             Analyze, optimize, and create ATS-friendly resumes with AI. Get instant feedback, improve your resume, generate personalized cover letters, and discover jobs that match your skills.
           </p>
 
           <div className="hero-ctas">
             <button className="cta-primary-btn" onClick={() => onViewChange("review")}>
-              🟡 Upload Resume
+              <span>📤</span> Upload Resume
             </button>
             <button className="cta-secondary-btn" onClick={() => onViewChange("builder_select_template")}>
-              ⚪ Build Resume
+              <span>✨</span> Build Resume
             </button>
           </div>
         </div>

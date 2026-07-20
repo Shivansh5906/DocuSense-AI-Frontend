@@ -272,12 +272,32 @@
   box-sizing: border-box;
 }
 
+.hero-badge-container {
+  margin-bottom: 16px;
+  display: flex;
+}
+
+.hero-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(79, 70, 229, 0.08);
+  border: 1px solid rgba(79, 70, 229, 0.2);
+  padding: 6px 14px;
+  border-radius: 99px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--primary);
+  line-height: 1.4;
+  text-align: left;
+}
+
 .hero-section {
   display: grid;
   grid-template-columns: 1.12fr 0.88fr;
   gap: 50px;
   align-items: center;
-  padding: 60px 80px;
+  padding: 50px 60px;
   background: #ffffff; /* Pure white card background */
   border-radius: 16px;
   box-shadow: 0 10px 40px rgba(15, 23, 42, 0.04), 0 2px 4px rgba(15, 23, 42, 0.02);
@@ -285,8 +305,8 @@
 }
 
 .hero-title {
-  font-size: 3.4rem;
-  line-height: 1.12;
+  font-size: 3.2rem;
+  line-height: 1.15;
   font-weight: 800;
   color: #0f172a;
   margin: 0 0 16px 0;
@@ -294,10 +314,10 @@
 }
 
 .hero-desc {
-  font-size: 1.25rem;
+  font-size: 1.15rem;
   color: #475569;
-  line-height: 1.5;
-  margin-bottom: 20px;
+  line-height: 1.55;
+  margin-bottom: 28px;
   max-width: 580px;
 }
 
@@ -316,6 +336,7 @@
   display: flex;
   gap: 16px;
   margin-bottom: 20px;
+  flex-wrap: wrap;
 }
 
 .cta-primary-btn {
@@ -329,6 +350,10 @@
   cursor: pointer;
   box-shadow: 0 4px 12px rgba(5, 150, 105, 0.2);
   transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
 }
 
 .cta-primary-btn:hover {
@@ -347,6 +372,10 @@
   border-radius: 8px;
   cursor: pointer;
   transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
 }
 
 .cta-secondary-btn:hover {
@@ -1847,8 +1876,13 @@
   color: #ffffff;
 }
 
-/* Tablet & Mobile responsive adjustments */
 @media (max-width: 1024px) {
+  .hero-section {
+    grid-template-columns: 1fr;
+    padding: 36px 28px;
+    gap: 30px;
+  }
+
   .builder-workspace-grid {
     flex-direction: column;
   }
@@ -1883,6 +1917,49 @@
 }
 
 @media (max-width: 600px) {
+  .landing-dashboard-container {
+    padding: 12px 8px;
+  }
+  .hero-section {
+    padding: 24px 16px;
+    border-radius: 14px;
+    gap: 20px;
+  }
+  .hero-title {
+    font-size: 1.85rem;
+    line-height: 1.2;
+    letter-spacing: -0.5px;
+    margin-bottom: 12px;
+  }
+  .hero-desc {
+    font-size: 0.95rem;
+    line-height: 1.5;
+    margin-bottom: 20px;
+  }
+  .hero-badge-container {
+    margin-bottom: 12px;
+  }
+  .hero-badge {
+    font-size: 0.75rem;
+    padding: 6px 10px;
+    line-height: 1.35;
+  }
+  .hero-ctas {
+    flex-direction: row;
+    gap: 10px;
+    width: 100%;
+  }
+  .cta-primary-btn,
+  .cta-secondary-btn {
+    flex: 1;
+    padding: 12px 8px;
+    font-size: 0.88rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+  }
+
   .builder-top-bar {
     flex-direction: column;
     align-items: stretch;
