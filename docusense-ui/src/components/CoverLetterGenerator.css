@@ -72,6 +72,8 @@
   transition: all 0.2s ease;
   box-sizing: border-box;
   font-family: inherit;
+  background-color: #ffffff;
+  color: #0f172a;
 }
 
 /* Custom select dropdown cross-browser overrides */
@@ -212,6 +214,23 @@
   }
   .input-card, .preview-card {
     padding: 16px;
+    box-shadow: none;
+  }
+  .preview-header {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+  .preview-header h3 {
+    margin-bottom: 0;
+  }
+  .btn-copy {
+    width: 100%;
+    justify-content: center;
+    min-height: 44px;
+    display: flex;
+    align-items: center;
   }
   .editable-letter, .placeholder-text {
     height: 300px;
