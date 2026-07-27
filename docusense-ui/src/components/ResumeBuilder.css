@@ -272,6 +272,24 @@
   box-sizing: border-box;
 }
 
+.features-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 24px;
+}
+
+.how-works-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 30px;
+}
+
+.why-choose-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 20px;
+}
+
 .hero-badge-container {
   margin-bottom: 16px;
   display: flex;
@@ -1920,6 +1938,15 @@
 @media (max-width: 600px) {
   .landing-dashboard-container {
     padding: 12px 8px;
+  }
+  .features-grid,
+  .how-works-grid,
+  .why-choose-grid {
+    grid-template-columns: 1fr !important;
+    gap: 16px !important;
+  }
+  .hero-graphics {
+    display: none !important;
   }
   .hero-section {
     padding: 24px 16px;

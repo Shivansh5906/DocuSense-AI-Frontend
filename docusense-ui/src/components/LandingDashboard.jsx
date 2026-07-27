@@ -284,7 +284,7 @@ export default function LandingDashboard({ onViewChange }) {
           <h2 style={{ fontSize: "2.2rem", fontWeight: "800", color: "#0f172a" }}>Everything You Need to Land Your Dream Job</h2>
           <p style={{ color: "#64748b" }}>DocuSense provides advanced AI integrations to streamline your application pipeline.</p>
         </div>
-        <div className="features-grid" style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "24px", border: "none", paddingTop: "0" }}>
+        <div className="features-grid" style={{ border: "none", paddingTop: "0" }}>
           {featuresList.map((f, idx) => (
             <div key={idx} className="feature-card card" style={{ background: "#ffffff", border: "1px solid rgba(15, 23, 42, 0.06)", padding: "28px", borderRadius: "12px", boxShadow: "0 4px 20px rgba(15, 23, 42, 0.02)" }}>
               <span className="feature-icon" style={{ fontSize: "2rem", display: "block", marginBottom: "15px" }}>{f.icon}</span>
@@ -302,7 +302,7 @@ export default function LandingDashboard({ onViewChange }) {
           <p style={{ color: "#64748b" }}>Go from a raw draft to interview invites in minutes.</p>
         </div>
 
-        <div className="how-works-grid" style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "30px" }}>
+        <div className="how-works-grid">
           {howItWorks.map((item, idx) => (
             <div key={idx} className="how-step-card card" style={{ background: "#ffffff", border: "1px solid rgba(15, 23, 42, 0.06)", padding: "30px", borderRadius: "12px", position: "relative" }}>
               <div className="step-number-badge" style={{ fontSize: "2.2rem", marginBottom: "16px" }}>{item.step}</div>
@@ -320,7 +320,7 @@ export default function LandingDashboard({ onViewChange }) {
           <p style={{ color: "#64748b" }}>Engineered around recruiting heuristics and ATS scanning logic to optimize parsing success.</p>
         </div>
 
-        <div className="why-choose-grid" style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "20px" }}>
+        <div className="why-choose-grid">
           {whyChooseDocuSense.map((bullet, idx) => (
             <div key={idx} className="why-bullet-card" style={{ background: "#ffffff", border: "1px solid rgba(15, 23, 42, 0.06)", padding: "20px", borderRadius: "8px", display: "flex", alignItems: "center", gap: "12px", boxShadow: "0 2px 10px rgba(15, 23, 42, 0.01)" }}>
               <span className="bullet-check-icon" style={{ color: "#10b981", fontSize: "1.1rem", fontWeight: "700" }}>✔</span>
