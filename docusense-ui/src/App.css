@@ -240,7 +240,8 @@ body {
   justify-content: center;
 }
 
-.doc-item:hover .delete-doc-icon {
+.doc-item:hover .delete-doc-icon,
+.doc-failed .delete-doc-icon {
   opacity: 1;
 }
 

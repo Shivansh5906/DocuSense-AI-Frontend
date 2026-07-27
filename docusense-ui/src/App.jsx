@@ -33,13 +33,15 @@ export default function App() {
     setIsMobileSidebarOpen(false);
   };
 
+  const [dismissedFailedFiles, setDismissedFailedFiles] = useState([]);
+
   // Monitor for document validation failure to prompt user
   useEffect(() => {
-    const failedDoc = documents.find((d) => d.status === "failed");
+    const failedDoc = documents.find((d) => d.status === "failed" && !dismissedFailedFiles.includes(d.filename));
     if (failedDoc && (!invalidFile || invalidFile.filename !== failedDoc.filename)) {
-      setInvalidFile({ filename: failedDoc.filename });
+      setInvalidFile({ filename: failedDoc.filename, summary: failedDoc.summary });
     }
-  }, [documents, invalidFile]);
+  }, [documents, invalidFile, dismissedFailedFiles]);
 
   // Warm up sleeping Render backend on page load
   useEffect(() => {
@@ -181,7 +183,7 @@ export default function App() {
                       }
                     }}
                     className={`doc-item ${selectedFilename === doc.filename ? "active" : ""} ${doc.status === "indexing" ? "doc-indexing" : ""} ${doc.status === "failed" ? "doc-failed" : ""}`}
-                    title={doc.filename}
+                    title={doc.status === "failed" ? `Processing failed for "${doc.filename}". Click 🗑️ to delete or re-upload.` : doc.filename}
                     disabled={doc.status === "indexing" || doc.status === "failed"}
                   >
                     <span className={`doc-item-icon ${doc.status === "indexing" ? "spin-icon" : ""}`}>
@@ -270,7 +272,7 @@ export default function App() {
             )}
 
             {activeView === "cover_letter" && (
-              <CoverLetterGenerator />
+              <CoverLetterGenerator selectedFilename={selectedFilename} />
             )}
 
             {activeView === "interview_prep" && (
@@ -360,32 +362,67 @@ export default function App() {
         </main>
       </div>
 
-      {invalidFile && (
-        <div className="modal-overlay">
-          <div className="modal-content">
-            <span className="modal-icon">⚠️</span>
-            <h2>Invalid Document</h2>
-            <p>
-              The document <strong>{invalidFile.filename}</strong> does not appear to be a valid Resume or CV. Please upload a correct Resume/CV file.
-            </p>
-            <button
-              className="primary-btn"
-              style={{ marginTop: "10px" }}
-              onClick={async () => {
-                const fname = invalidFile.filename;
-                setInvalidFile(null);
-                await handleDelete(fname);
-                const fileInput = document.getElementById("app-global-file-input");
-                if (fileInput) {
-                  fileInput.click();
-                }
-              }}
-            >
-              Upload Again
-            </button>
+      {invalidFile && (() => {
+        const isSystemError = invalidFile.summary && (
+          invalidFile.summary.includes("404") ||
+          invalidFile.summary.includes("500") ||
+          invalidFile.summary.includes("API") ||
+          invalidFile.summary.includes("embed") ||
+          invalidFile.summary.includes("ClientError") ||
+          invalidFile.summary.includes("Connection")
+        );
+
+        return (
+          <div className="modal-overlay">
+            <div className="modal-content">
+              <span className="modal-icon">⚠️</span>
+              <h2>{isSystemError ? "System / API Error" : "Invalid Document"}</h2>
+              <p style={{ margin: "10px 0 15px", lineHeight: "1.6" }}>
+                {isSystemError ? (
+                  <>
+                    An error occurred while indexing <strong>{invalidFile.filename}</strong>: <br />
+                    <code style={{ fontSize: "0.85rem", background: "rgba(255,255,255,0.1)", padding: "4px 8px", borderRadius: "4px", display: "inline-block", marginTop: "8px", wordBreak: "break-all" }}>
+                      {invalidFile.summary}
+                    </code>
+                  </>
+                ) : (
+                  <>
+                    The document <strong>{invalidFile.filename}</strong> does not appear to be a valid Resume or CV. Please upload a correct Resume/CV file.
+                  </>
+                )}
+              </p>
+              <div style={{ display: "flex", gap: "10px", justifyContent: "center", marginTop: "15px" }}>
+                <button
+                  className="secondary-btn"
+                  onClick={async () => {
+                    const fname = invalidFile.filename;
+                    setDismissedFailedFiles((prev) => [...prev, fname]);
+                    setInvalidFile(null);
+                    await handleDelete(fname);
+                  }}
+                >
+                  Dismiss
+                </button>
+                <button
+                  className="primary-btn"
+                  onClick={async () => {
+                    const fname = invalidFile.filename;
+                    setDismissedFailedFiles((prev) => [...prev, fname]);
+                    setInvalidFile(null);
+                    await handleDelete(fname);
+                    const fileInput = document.getElementById("app-global-file-input");
+                    if (fileInput) {
+                      fileInput.click();
+                    }
+                  }}
+                >
+                  Upload Again
+                </button>
+              </div>
+            </div>
           </div>
-        </div>
-      )}
+        );
+      })()}
       <input
         type="file"
         id="app-global-file-input"

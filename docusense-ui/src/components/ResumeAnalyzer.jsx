@@ -29,6 +29,7 @@ export default function ResumeAnalyzer({ documents: allDocs = [], selectedFilena
       setUploadProgress(10);
 
       await api.post("/documents/upload", formData, {
+        timeout: 45000,
         onUploadProgress: (e) => {
           if (e.total) {
             const percent = Math.round((e.loaded * 100) / e.total);
@@ -334,7 +335,8 @@ export default function ResumeAnalyzer({ documents: allDocs = [], selectedFilena
         jd_text: jdText,
         jd_title: jdTitle,
         jd_company: jdCompany,
-        tone: coverLetterTone
+        tone: coverLetterTone,
+        resume_version_id: selectedVersionId ? parseInt(selectedVersionId, 10) : null
       });
       setCoverLetterReport(res.data);
     } catch (err) {

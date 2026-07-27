@@ -1,8 +1,9 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "./CoverLetterGenerator.css";
 import { streamAgentWorkflow } from "../api/agentStream";
+import api from "../api/client";
 
-export default function CoverLetterGenerator() {
+export default function CoverLetterGenerator({ selectedFilename }) {
   const [resumeText, setResumeText] = useState("");
   const [jdText, setJdText] = useState("");
   const [targetCompany, setTargetCompany] = useState("");
@@ -12,6 +13,57 @@ export default function CoverLetterGenerator() {
   const [loading, setLoading] = useState(false);
   const [agentStatus, setAgentStatus] = useState("");
   const [copied, setCopied] = useState(false);
+
+  const [versions, setVersions] = useState([]);
+  const [selectedVersionId, setSelectedVersionId] = useState("");
+
+  useEffect(() => {
+    if (!selectedFilename) {
+      setVersions([]);
+      setSelectedVersionId("");
+      return;
+    }
+
+    const fetchResumeAndVersions = async () => {
+      try {
+        // Fetch original base resume text
+        const response = await api.get(`/documents/${selectedFilename}/text`);
+        if (response.data && response.data.text) {
+          setResumeText(response.data.text);
+        }
+        
+        // Fetch tailored versions
+        const versionsResponse = await api.get("/resume/versions", { params: { filename: selectedFilename } });
+        if (versionsResponse.data && versionsResponse.data.versions) {
+          setVersions(versionsResponse.data.versions);
+        }
+        setSelectedVersionId("");
+      } catch (error) {
+        console.error("Failed to fetch resume text content or versions:", error);
+      }
+    };
+
+    fetchResumeAndVersions();
+  }, [selectedFilename]);
+
+  const handleVersionChange = async (versionId) => {
+    setSelectedVersionId(versionId);
+    if (versionId === "") {
+      try {
+        const response = await api.get(`/documents/${selectedFilename}/text`);
+        if (response.data && response.data.text) {
+          setResumeText(response.data.text);
+        }
+      } catch (error) {
+        console.error("Failed to fetch original base text:", error);
+      }
+    } else {
+      const ver = versions.find((v) => v.id.toString() === versionId);
+      if (ver) {
+        setResumeText(ver.tailored_text);
+      }
+    }
+  };
 
   const handleGenerate = async () => {
     if (!resumeText.trim()) {
@@ -85,6 +137,20 @@ export default function CoverLetterGenerator() {
               <option value="Creative">Creative & Storytelling</option>
             </select>
           </div>
+
+          {versions.length > 0 && (
+            <div className="form-group">
+              <label>Target Resume Version (Optional)</label>
+              <select value={selectedVersionId} onChange={(e) => handleVersionChange(e.target.value)}>
+                <option value="">Original Base Text</option>
+                {versions.map((ver) => (
+                  <option key={ver.id} value={ver.id.toString()}>
+                    📄 {ver.version_name}
+                  </option>
+                ))}
+              </select>
+            </div>
+          )}
 
           <div className="form-group">
             <label>Resume / CV Content *</label>
