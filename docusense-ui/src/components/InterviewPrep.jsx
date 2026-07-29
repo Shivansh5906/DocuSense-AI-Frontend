@@ -1,8 +1,10 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "./InterviewPrep.css";
 import { streamAgentWorkflow } from "../api/agentStream";
+import api from "../api/client";
+import { jsPDF } from "jspdf";
 
-export default function InterviewPrep() {
+export default function InterviewPrep({ selectedFilename }) {
   const [resumeText, setResumeText] = useState("");
   const [jdText, setJdText] = useState("");
   
@@ -10,6 +12,104 @@ export default function InterviewPrep() {
   const [keywords, setKeywords] = useState({ matching: [], missing: [] });
   const [loading, setLoading] = useState(false);
   const [agentStatus, setAgentStatus] = useState("");
+
+  useEffect(() => {
+    if (!selectedFilename) {
+      setResumeText("");
+      return;
+    }
+
+    const fetchResumeText = async () => {
+      try {
+        const response = await api.get(`/documents/${selectedFilename}/text`);
+        if (response.data && response.data.text) {
+          setResumeText(response.data.text);
+        }
+      } catch (error) {
+        console.error("Failed to fetch resume text content:", error);
+      }
+    };
+
+    fetchResumeText();
+  }, [selectedFilename]);
+
+  const handleDownloadPDF = () => {
+    if (questions.length === 0) {
+      alert("No questions generated yet. Please run the generation first.");
+      return;
+    }
+
+    const doc = new jsPDF({
+      orientation: "portrait",
+      unit: "mm",
+      format: "a4"
+    });
+
+    // Header banner with modern blue gradient styled background
+    doc.setFillColor(30, 58, 138); // Primary dark blue (#1e3a8a)
+    doc.rect(0, 0, 210, 42, "F");
+
+    // Header Title
+    doc.setTextColor(255, 255, 255);
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(22);
+    doc.text("Docusense Interview Prep Report", 15, 18);
+
+    // Header Subtitle & Date
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(10.5);
+    doc.text("Tailored STAR-Method Questions & Prep Strategy", 15, 26);
+    doc.text(`Generated on: ${new Date().toLocaleDateString()}`, 15, 32);
+
+    let yPos = 55;
+    
+    questions.forEach((q, index) => {
+      // Height calculation to determine page break
+      const splitQuestion = doc.splitTextToSize(q.question, 180);
+      const splitIntent = doc.splitTextToSize(`Evaluates: ${q.intent}`, 180);
+      const splitApproach = doc.splitTextToSize(q.suggested_approach, 180);
+      
+      const estimatedHeight = 10 + (splitQuestion.length * 5) + (splitIntent.length * 4.5) + (splitApproach.length * 5) + 15;
+      
+      if (yPos + estimatedHeight > 275) {
+        doc.addPage();
+        yPos = 20;
+      }
+
+      // Question Index & Section Focus
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(12);
+      doc.setTextColor(30, 58, 138);
+      doc.text(`Question ${index + 1}: ${q.section || "Technical / Behavioral Focus"}`, 15, yPos);
+      yPos += 7;
+
+      // Question body
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(11);
+      doc.setTextColor(31, 41, 55);
+      doc.text(splitQuestion, 15, yPos);
+      yPos += splitQuestion.length * 5 + 3;
+
+      // Intent / Focus area
+      doc.setFont("helvetica", "italic");
+      doc.setFontSize(9.5);
+      doc.setTextColor(75, 85, 99);
+      doc.text(splitIntent, 15, yPos);
+      yPos += splitIntent.length * 4.5 + 4;
+
+      // Strategy
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(10);
+      doc.setTextColor(17, 24, 39);
+      doc.text("💡 Recommended STAR Strategy:", 15, yPos);
+      yPos += 5.5;
+      
+      doc.text(splitApproach, 15, yPos);
+      yPos += splitApproach.length * 5 + 12; // Gap between questions
+    });
+
+    doc.save(`Docusense_Interview_Prep_${selectedFilename || "Report"}.pdf`);
+  };
 
   const handleGeneratePrep = async () => {
     if (!resumeText.trim()) {
@@ -95,6 +195,15 @@ export default function InterviewPrep() {
           >
             {loading ? "⚡ Coach Agent Analyzing..." : "🎓 Generate Interview Questions & Keywords"}
           </button>
+
+          {questions.length > 0 && (
+            <button 
+              className="btn-download-pdf"
+              onClick={handleDownloadPDF}
+            >
+              📥 Download Questions & Answers (PDF)
+            </button>
+          )}
 
           {agentStatus && <div className="agent-status-badge">{agentStatus}</div>}
         </div>

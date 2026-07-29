@@ -276,7 +276,7 @@ export default function App() {
             )}
 
             {activeView === "interview_prep" && (
-              <InterviewPrep />
+              <InterviewPrep selectedFilename={selectedFilename} />
             )}
 
             {activeView === "review" && (
